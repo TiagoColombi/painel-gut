@@ -1,0 +1,50 @@
+{
+  "name": "Painel de Tarefas GUT",
+  "short_name": "Painel GUT",
+  "description": "Tarefas por gravidade, urgência e tendência, com atraso acumulado",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#E6EAEC",
+  "theme_color": "#12181D",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512-m.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "Nova tarefa",
+      "short_name": "Nova",
+      "url": "./index.html?acao=nova",
+      "icons": [{ "src": "icone-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ditar tarefa",
+      "short_name": "Ditar",
+      "url": "./index.html?acao=voz",
+      "icons": [{ "src": "icone-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Triagem do dia",
+      "short_name": "Triagem",
+      "url": "./index.html?acao=triagem",
+      "icons": [{ "src": "icone-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
