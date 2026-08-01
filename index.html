@@ -213,6 +213,85 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .btn-vazio{background:transparent;color:var(--tinta)}
 .btn-perigo{border-color:var(--alta);color:var(--alta)}
 
+/* aprovação */
+.selo.aguardando-ap{color:#5A4B00;background:#FBF3D4;border-color:#E8D9A0}
+.selo.aprovada{color:var(--baixa);background:#E8F5E9;border-color:#B7DFB9}
+.selo.recusada{color:var(--alta);background:#FDECEC;border-color:#F3BDBD}
+.selo.sugerida{color:var(--aco);background:#E6F1F5;border-color:#B6D5DF}
+.painel-ap{
+  border:1px solid var(--linha);border-left:4px solid var(--media);border-radius:3px;
+  background:#FDFAF0;padding:10px 11px;margin-bottom:12px;font-size:13.5px;
+}
+.painel-ap.recusa{border-left-color:var(--alta);background:#FDF3F3}
+.painel-ap.ok{border-left-color:var(--baixa);background:#F2F9F3}
+.painel-ap b{display:block;font-family:var(--cond);letter-spacing:.1em;text-transform:uppercase;font-size:11px;color:var(--tinta-2);margin-bottom:5px}
+.ap-linha{display:flex;justify-content:space-between;gap:9px;padding:4px 0;border-bottom:1px dashed var(--linha)}
+.ap-linha:last-child{border-bottom:none}
+.ap-motivo{background:#fff;border:1px solid var(--linha);border-radius:3px;padding:8px 10px;margin-top:7px;font-style:italic}
+.ap-dados{font-size:14px;line-height:1.7;margin-bottom:12px}
+.ap-dados .rot{font-family:var(--mono);font-size:11px;color:var(--tinta-3);text-transform:uppercase;letter-spacing:.06em}
+
+/* menu de ações (toque longo) */
+.menu-acoes{display:flex;flex-direction:column;gap:2px}
+.menu-acoes button{
+  display:flex;align-items:center;gap:12px;padding:14px 10px;text-align:left;
+  border-bottom:1px solid var(--linha);font-size:15px;
+}
+.menu-acoes button:last-child{border-bottom:none}
+.menu-acoes button .ic{font-size:19px;width:26px;text-align:center;flex:none}
+.menu-acoes button.perigo{color:var(--alta)}
+.menu-acoes .sub{display:block;font-size:12px;color:var(--tinta-3);margin-top:1px}
+
+/* seleção múltipla */
+.barra-selecao{
+  position:sticky;top:0;z-index:45;background:var(--aco);color:#fff;
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+}
+.barra-selecao[hidden]{display:none}
+.barra-selecao button{color:#fff;font-size:14px;padding:6px 10px;border-radius:3px}
+.barra-selecao #selCancelar{font-size:20px;padding:2px 8px}
+.barra-selecao #selConta{flex:1;font-family:var(--cond);letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+.barra-selecao button.forte{background:#fff;color:var(--aco);font-weight:700}
+.tarefa.marcada{box-shadow:inset 0 0 0 2px var(--aco), var(--sombra);background:#F0F6F8}
+.tarefa.press{transform:scale(.985);transition:transform .12s}
+
+/* modo carro: tudo grande, alto contraste, um único alvo de toque */
+.carro{
+  position:fixed;inset:0;z-index:200;background:#0A0E11;color:#F2F5F6;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;text-align:center;gap:22px;
+}
+.carro.aberta{display:flex}
+.carro-sair{
+  position:absolute;top:calc(env(safe-area-inset-top) + 10px);right:14px;
+  font-size:34px;color:#5F7A85;width:54px;height:54px;
+}
+.carro-topo{
+  font-family:var(--cond);font-size:15px;letter-spacing:.2em;text-transform:uppercase;color:#7E949F;
+}
+.carro-alvo{
+  width:min(62vw,260px);height:min(62vw,260px);border-radius:50%;
+  background:#16212A;border:3px solid #2E7D32;display:grid;place-items:center;position:relative;
+}
+.carro-alvo.ouvindo{border-color:var(--alta);background:#2A1416}
+.carro-alvo.pensando{border-color:var(--media)}
+.carro-icone{font-size:min(20vw,80px);line-height:1}
+.carro-onda{
+  position:absolute;inset:-14px;border-radius:50%;border:3px solid var(--alta);opacity:0;
+}
+.carro-alvo.ouvindo .carro-onda{animation:onda 1.4s infinite}
+@keyframes onda{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+.carro-texto{
+  font-size:clamp(20px,5.6vw,30px);font-weight:600;line-height:1.35;max-width:640px;min-height:2.6em;
+}
+.carro-texto .quando{display:block;font-size:.66em;color:#8FB4C4;font-weight:400;margin-top:8px}
+.carro-acoes{display:flex;gap:12px;width:100%;max-width:520px}
+.carro-btn{
+  flex:1;padding:24px 12px;border-radius:8px;border:2px solid #3D4A55;background:#16212A;color:#F2F5F6;
+  font-family:var(--cond);font-size:19px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+}
+.carro-btn.ok{background:#2E7D32;border-color:#2E7D32}
+
 .zona{
   border:1px dashed var(--linha-forte);border-radius:4px;background:#F4F7F8;
   padding:20px 12px;text-align:center;font-size:13.5px;color:var(--tinta-2);cursor:pointer;
@@ -232,6 +311,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   padding:1px 5px;margin-bottom:6px;color:var(--tinta-2);
 }
 
+.atalhos-data{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 12px}
+.atalho-data{
+  border:1px solid var(--aco);color:var(--aco);background:#E6F1F5;
+  border-radius:999px;padding:7px 13px;font-size:13.5px;
+}
 .rotulo{
   display:block;font-family:var(--cond);font-size:11px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--tinta-2);margin-bottom:4px;
@@ -346,6 +430,13 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   <div class="medidor-legenda"><span id="medEsq">—</span><span id="medDir">—</span></div>
 </header>
 
+<div class="barra-selecao" id="barraSelecao" hidden>
+  <button id="selCancelar" aria-label="Cancelar seleção">✕</button>
+  <span id="selConta">0 selecionadas</span>
+  <button id="selTodas">Todas</button>
+  <button id="selCompartilhar" class="forte">Compartilhar</button>
+</div>
+
 <nav class="abas" role="tablist">
   <button role="tab" aria-selected="true" data-aba="lista">Prioridade</button>
   <button role="tab" aria-selected="false" data-aba="calendario">Calendário</button>
@@ -397,6 +488,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <label class="campo"><span>Dia</span><input type="date" id="fData"></label>
       <label class="campo"><span>Hora</span><input type="time" id="fHora"></label>
     </div>
+    <div class="atalhos-data" id="atalhosData" hidden></div>
 
     <label class="campo"><span>Frente</span><select id="fCategoria"></select></label>
 
@@ -466,6 +558,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <div class="nota">Tarefa aguardando terceiros não acumula atraso: vira cobrança na data marcada.</div>
     </label>
 
+    <div id="blocoAprovacao"></div>
+
     <label class="campo"><span>Observações</span><textarea id="fNota" rows="2"></textarea></label>
 
     <div class="acoes">
@@ -475,6 +569,125 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     <div class="acoes" id="acoesExtra" hidden style="margin-top:8px">
       <button class="btn btn-vazio btn-perigo" id="btnExcluir">Excluir</button>
     </div>
+  </div>
+</div>
+
+<!-- PEDIR APROVAÇÃO -->
+<div class="folha" id="folhaPedir" role="dialog" aria-modal="true" aria-label="Pedir aprovação">
+  <div class="folha-corpo">
+    <div class="folha-topo">
+      <h2>Pedir aprovação</h2>
+      <button class="fechar" data-fecha aria-label="Fechar">×</button>
+    </div>
+    <div class="previa" id="pedirPrevia" style="margin-bottom:12px"></div>
+
+    <div class="campo">
+      <span class="rotulo">Quem precisa aprovar</span>
+      <div class="chips-pessoas" id="pedirPessoas"></div>
+      <div class="pessoa-linha" style="margin-top:8px">
+        <button type="button" id="pedirAgenda">📇 Agenda</button>
+        <button type="button" id="pedirNovo">+ Novo contato</button>
+      </div>
+    </div>
+
+    <label class="campo"><span>Recado (opcional)</span>
+      <textarea id="pedirRecado" rows="2" placeholder="Ex.: precisa sair antes do fim do mês, me diga se dá."></textarea>
+    </label>
+
+    <label class="campo"><span>Seu número (para receberem a resposta)</span>
+      <input type="text" id="pedirMeuTel" inputmode="tel" placeholder="27 99999-8888">
+      <div class="nota">Vai no pedido para que a resposta volte direto pra você no WhatsApp.</div>
+    </label>
+
+    <div class="acoes">
+      <button class="btn btn-vazio" data-fecha>Cancelar</button>
+      <button class="btn btn-cheio" id="pedirEnviar">Enviar pedidos</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESPONDER APROVAÇÃO (quem recebe) -->
+<div class="folha" id="folhaAprovar" role="dialog" aria-modal="true" aria-label="Aprovação">
+  <div class="folha-corpo">
+    <div class="folha-topo">
+      <h2 id="aprovarTitulo">Pedido de aprovação</h2>
+      <button class="fechar" data-fecha aria-label="Fechar">×</button>
+    </div>
+    <div id="aprovarCorpo"></div>
+
+    <div id="aprovarBotoes" class="canais" style="margin-top:14px">
+      <button class="canal" id="btnAprovar" style="background:#2E7D32;border-color:#2E7D32;color:#fff">✓ Aprovar</button>
+      <button class="canal btn-vazio" id="btnSugerir" style="border-color:var(--media);color:#8A6000">📅 Sugerir outra data</button>
+      <button class="canal btn-vazio" id="btnRecusar" style="border-color:var(--alta);color:var(--alta);grid-column:1 / -1">✕ Não vai dar</button>
+    </div>
+
+    <div id="aprovarSugestao" hidden style="margin-top:14px">
+      <div class="painel-ap"><b>Proponha até duas opções</b>Quem pediu escolhe uma delas.</div>
+      <div class="rotulo">Opção 1 (obrigatória)</div>
+      <div class="duo">
+        <label class="campo"><span>Dia</span><input type="date" id="sug1Data"></label>
+        <label class="campo"><span>Hora</span><input type="time" id="sug1Hora"></label>
+      </div>
+      <div class="rotulo">Opção 2 (se quiser dar alternativa)</div>
+      <div class="duo">
+        <label class="campo"><span>Dia</span><input type="date" id="sug2Data"></label>
+        <label class="campo"><span>Hora</span><input type="time" id="sug2Hora"></label>
+      </div>
+      <label class="campo"><span>Justificativa (opcional)</span>
+        <textarea id="sugMotivo" rows="2" placeholder="Ex.: nessas datas a equipe está livre e o clima ajuda."></textarea>
+      </label>
+      <div class="acoes">
+        <button class="btn btn-vazio" id="sugVoltar">Voltar</button>
+        <button class="btn btn-cheio" id="sugEnviar">Enviar sugestões</button>
+      </div>
+    </div>
+
+    <div id="aprovarRecusa" hidden style="margin-top:14px">
+      <label class="campo"><span>Por que não dá? (obrigatório)</span>
+        <textarea id="aprovarMotivo" rows="3" placeholder="Ex.: nessa data a equipe está na colheita, só depois do dia 20."></textarea>
+      </label>
+      <div class="acoes">
+        <button class="btn btn-vazio" id="recusaVoltar">Voltar</button>
+        <button class="btn btn-cheio" id="recusaEnviar">Enviar recusa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ESCOLHER ENTRE AS SUGESTÕES (quem pediu) -->
+<div class="folha" id="folhaEscolha" role="dialog" aria-modal="true" aria-label="Escolher data">
+  <div class="folha-corpo">
+    <div class="folha-topo">
+      <h2 id="escolhaTitulo">Sugeriram outras datas</h2>
+      <button class="fechar" data-fecha aria-label="Fechar">×</button>
+    </div>
+    <div id="escolhaCorpo"></div>
+  </div>
+</div>
+
+<!-- AÇÕES DA TAREFA (toque longo) -->
+<div class="folha" id="folhaAcoes" role="dialog" aria-modal="true" aria-label="Ações da tarefa">
+  <div class="folha-corpo">
+    <div class="folha-topo">
+      <h2 id="acoesTitulo">Tarefa</h2>
+      <button class="fechar" data-fecha aria-label="Fechar">×</button>
+    </div>
+    <div class="menu-acoes" id="menuAcoes"></div>
+  </div>
+</div>
+
+<!-- MODO CARRO -->
+<div class="carro" id="modoCarro" role="dialog" aria-modal="true" aria-label="Modo dirigindo">
+  <button class="carro-sair" id="carroSair" aria-label="Sair">×</button>
+  <div class="carro-topo" id="carroEstado">Toque para falar</div>
+  <button class="carro-alvo" id="carroAlvo" aria-label="Falar">
+    <span class="carro-onda" id="carroOnda"></span>
+    <span class="carro-icone">🎙</span>
+  </button>
+  <div class="carro-texto" id="carroTexto">Diga a tarefa e quando</div>
+  <div class="carro-acoes" id="carroAcoes" hidden>
+    <button class="carro-btn ok" id="carroSalvar">Salvar</button>
+    <button class="carro-btn" id="carroRepetir">Falar de novo</button>
   </div>
 </div>
 
@@ -589,6 +802,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <label class="campo" style="margin-top:12px"><span>Assinatura das mensagens</span>
         <input type="text" id="cfgAssinatura" placeholder="Ex.: Tiago — IGRO">
       </label>
+      <label class="campo"><span>Meu número no WhatsApp</span>
+        <input type="text" id="cfgMeuTel" inputmode="tel" placeholder="27 99999-8888">
+        <div class="nota">Vai nos pedidos de aprovação, para as respostas voltarem direto pra você.</div>
+      </label>
     </div>
 
     <div class="linha-cfg">
@@ -683,7 +900,7 @@ const PADRAO = {
     {id:"fios",    nome:"Fios.com",  cor:"#DB2777"},
     {id:"terceiros",nome:"Terceiros",cor:"#64748B"}
   ],
-  config:{ peso:0.08, tetoFator:3, corteAlta:45, corteMedia:15, assinatura:"" },
+  config:{ peso:0.08, tetoFator:3, corteAlta:45, corteMedia:15, assinatura:"", meuTelefone:"" },
   pessoas:[],
   tarefas:[],
   filtros:[]
@@ -979,9 +1196,10 @@ function visiveis(){
 function cartao(t){
   const p = pontuacao(t), f = faixa(p), cat = catDe(t.categoria), atraso = diasAtraso(t);
   const el = document.createElement("article");
-  el.className = "tarefa prio-"+f+(t.concluida?" feita":"");
+  el.className = "tarefa prio-"+f+(t.concluida?" feita":"")+(selecionadas.has(t.id)?" marcada":"");
   el.style.setProperty("--flag", cat.cor);
   el.dataset.id = t.id;
+  ligarToqueLongo(el, t);
 
   const pega = document.createElement("div");
   pega.className="pega"; pega.textContent="⣿"; pega.title="Arrastar para fixar a posição";
@@ -995,7 +1213,7 @@ function cartao(t){
   cx.setAttribute("aria-checked", t.concluida?"true":"false");
   cx.setAttribute("aria-label","Concluir "+t.titulo);
   cx.textContent = t.concluida ? "✓" : "";
-  cx.onclick = (e)=>{ e.stopPropagation(); concluir(t); };
+  cx.onclick = (e)=>{ e.stopPropagation(); if(modoSelecao) alternarSelecao(t); else concluir(t); };
 
   const cabeca = document.createElement("div");
   cabeca.style.cssText="display:flex;gap:9px;align-items:flex-start";
@@ -1012,6 +1230,13 @@ function cartao(t){
   if(t.estado==="aguardando") meta.innerHTML += '<span class="selo espera">aguardando</span>';
   if(t.repete && t.repete.freq!=="none") meta.innerHTML += '<span class="selo repete">repete</span>';
   if(t.fixada) meta.innerHTML += '<span class="selo fixa">fixada</span>';
+  const stAp = estadoAprovacao(t);
+  if(stAp){
+    if(stAp.tipo==="pendente") meta.innerHTML += '<span class="selo aguardando-ap">aguardando aprovação '+stAp.ok+'/'+stAp.total+'</span>';
+    else if(stAp.tipo==="aprovado") meta.innerHTML += '<span class="selo aprovada">aprovada</span>';
+    else if(stAp.tipo==="sugerido") meta.innerHTML += '<span class="selo sugerida">nova data sugerida</span>';
+    else meta.innerHTML += '<span class="selo recusada">recusada</span>';
+  }
   const pessoas = pessoasDaTarefa(t).map(pessoaDe).filter(Boolean);
   const pes = pessoas[0] || null;
   pessoas.forEach(p=>{
@@ -1052,7 +1277,8 @@ function cartao(t){
   dir.appendChild(pts); dir.appendChild(barra); dir.appendChild(gm);
   el.appendChild(dir);
 
-  meio.onclick = ()=>abrirForm(t);
+  meio.onclick = ()=>{ if(modoSelecao) alternarSelecao(t); else abrirForm(t); };
+  dir.onclick = ()=>{ if(modoSelecao) alternarSelecao(t); };
   return el;
 }
 
@@ -1298,6 +1524,41 @@ function atualizarDips(){
     + (fat>1 ? "  ·  atraso ×"+fat.toFixed(2) : "")
     + "  ·  " + (f==="alta"?"ALTA":f==="media"?"MÉDIA":"BAIXA");
 }
+function renderBlocoAprovacao(t){
+  const box = document.getElementById("blocoAprovacao");
+  if(!box) return;
+  box.innerHTML = "";
+  const st = t ? estadoAprovacao(t) : null;
+  if(!st) return;
+  const classe = st.tipo==="recusado" ? "recusa" : st.tipo==="aprovado" ? "ok" : "";
+  const titulo = st.tipo==="recusado" ? "Recusada — precisa de ajuste"
+              : st.tipo==="aprovado" ? "Aprovada por todos"
+              : st.tipo==="sugerido" ? "Sugeriram outra data"
+              : "Aguardando aprovação ("+st.ok+" de "+st.total+")";
+  let html = '<div class="painel-ap '+classe+'"><b>'+titulo+'</b>';
+  t.aprovacao.aprovadores.forEach(a=>{
+    const marca = a.estado==="aprovado" ? "✅" : a.estado==="recusado" ? "❌"
+                : a.estado==="contraproposta" ? "📅" : "⏳";
+    html += '<div class="ap-linha"><span>'+marca+' '+escapar(a.nome||"—")+'</span>'
+      + '<span style="font-family:var(--mono);font-size:11px;color:var(--tinta-3)">'
+      + (a.quando ? rotuloData(a.quando.slice(0,10)) : "pendente")+'</span></div>';
+    if(a.justificativa || (a.opcoes && a.opcoes.length)){
+      html += '<div class="ap-motivo">'+escapar(a.justificativa||"");
+      if(a.opcoes && a.opcoes.length){
+        html += (a.justificativa?'<br>':'')+'<b style="font-style:normal">Sugeriu: '
+          + a.opcoes.map(o=>escapar(rotuloExtenso(o.data)+(o.hora?" às "+o.hora:""))).join(" ou ")+'</b>';
+      }
+      html += '</div>';
+    }
+  });
+  if(st.tipo==="recusado"){
+    html += '<div class="nota" style="margin-top:8px">Ajuste a data ou o texto acima e reenvie pelo toque longo na tarefa → Pedir aprovação.</div>';
+  } else if(st.tipo==="sugerido"){
+    html += '<div class="nota" style="margin-top:8px">Escolha uma das datas sugeridas ou defina outra acima, e reenvie o pedido.</div>';
+  }
+  html += '</div>';
+  box.innerHTML = html;
+}
 function abrirForm(t){
   editando = t || null;
   rascunho = t ? JSON.parse(JSON.stringify(t)) : novaTarefa();
@@ -1329,6 +1590,9 @@ function abrirForm(t){
   document.getElementById("fNota").value = rascunho.nota||"";
   atualizarRepete();
   atualizarDips();
+  const ad = document.getElementById("atalhosData");
+  if(ad) ad.hidden = true;
+  renderBlocoAprovacao(t);
   document.getElementById("folhaForm").classList.add("aberta");
   setTimeout(()=>document.getElementById("fTitulo").focus(), 60);
 }
@@ -1343,6 +1607,7 @@ function lerForm(){
   rascunho.hora = document.getElementById("fHora").value;
   rascunho.categoria = document.getElementById("fCategoria").value;
   rascunho.pessoaIds = Array.isArray(rascunho.pessoaIds) ? rascunho.pessoaIds : [];
+  if(editando && editando.aprovacao && !rascunho.aprovacao) rascunho.aprovacao = editando.aprovacao;
   rascunho.repete.freq = document.getElementById("fFreq").value;
   rascunho.repete.intervalo = Math.max(1, Number(document.getElementById("fIntervalo").value)||1);
   rascunho.repete.ate = document.getElementById("fAte").value;
@@ -1412,40 +1677,82 @@ function ditarPeloTeclado(){
   }, 200);
 }
 const Voz = {
-  rec:null, ativo:false,
+  rec:null, ocupado:false,
   suportado(){ return "webkitSpeechRecognition" in window || "SpeechRecognition" in window; },
-  falar(txt){
+  parar(){
+    if(this.rec){ try{ this.rec.onend=null; this.rec.abort(); }catch(e){} this.rec=null; }
+    this.ocupado = false;
+    const bt = document.getElementById("btnVoz");
+    if(bt) bt.classList.remove("ouvindo");
+  },
+  /* fala e só devolve o controle quando terminou de falar —
+     senão o microfone abre com a própria voz do app tocando e não ouve nada */
+  falar(txt, aoTerminar){
+    let feito = false;
+    const fim = ()=>{ if(feito) return; feito=true; if(aoTerminar) aoTerminar(); };
     try{
-      const u=new SpeechSynthesisUtterance(txt); u.lang="pt-BR"; u.rate=1.05;
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang="pt-BR"; u.rate=1.05;
+      u.onend = fim; u.onerror = fim;
       speechSynthesis.speak(u);
-    }catch(e){}
+      setTimeout(fim, 900 + txt.length*95);
+    }catch(e){ setTimeout(fim, 400); }
   },
   ouvir(aoTexto){
     const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if(!Rec){ aviso(diagnosticoVoz(), 6000); ditarPeloTeclado(); return; }
-    let r;
-    try{ r = new Rec(); }
-    catch(e){ aviso("Não consegui iniciar o microfone.", 5000); ditarPeloTeclado(); return; }
-    r.lang="pt-BR"; r.interimResults=false; r.maxAlternatives=1; r.continuous=false;
+    this.parar();
     const bt = document.getElementById("btnVoz");
-    bt.classList.add("ouvindo");
-    let recebeu = false;
-    r.onresult = e => { recebeu = true; aoTexto(e.results[0][0].transcript); };
-    r.onerror = e => {
-      bt.classList.remove("ouvindo");
-      const msg = explicarErroVoz(e.error);
-      if(msg){
-        aviso(msg, 8000);
-        if(e.error==="not-allowed" || e.error==="service-not-allowed") setTimeout(ditarPeloTeclado, 900);
+    /* pequena folga: o Android recusa iniciar se a sessão anterior ainda está fechando */
+    setTimeout(()=>{
+      let r;
+      try{ r = new Rec(); }
+      catch(e){ aviso("Não consegui iniciar o microfone.", 5000); return; }
+      r.lang="pt-BR"; r.interimResults=false; r.maxAlternatives=1; r.continuous=false;
+      this.rec = r; this.ocupado = true;
+      if(bt) bt.classList.add("ouvindo");
+      r.onresult = e => {
+        const txt = e.results[0][0].transcript;
+        this.ocupado = false;
+        if(bt) bt.classList.remove("ouvindo");
+        aoTexto(txt);
+      };
+      r.onerror = e => {
+        this.ocupado = false;
+        if(bt) bt.classList.remove("ouvindo");
+        const msg = explicarErroVoz(e.error);
+        if(msg){
+          aviso(msg, 8000);
+          if(e.error==="not-allowed" || e.error==="service-not-allowed") setTimeout(ditarPeloTeclado, 900);
+        }
+      };
+      r.onend = ()=>{ this.ocupado=false; if(bt) bt.classList.remove("ouvindo"); };
+      try{ r.start(); }
+      catch(e){
+        this.ocupado=false;
+        if(bt) bt.classList.remove("ouvindo");
+        aviso("Microfone ocupado. Aguarde um instante e toque de novo.", 5000);
       }
-    };
-    r.onend = ()=>{ bt.classList.remove("ouvindo"); };
-    try{ r.start(); }
-    catch(e){ bt.classList.remove("ouvindo"); aviso("Microfone ocupado. Feche outros apps que estejam usando.", 5000); }
-    this.rec = r;
+    }, 260);
+  },
+  /* pergunta falada: espera terminar de falar, aí escuta */
+  perguntar(texto, aoTexto){
+    aviso("🔊 "+texto, 6000);
+    this.falar(texto, ()=>this.ouvir(aoTexto));
   }
 };
+(function ligarModoCarro(){
+  const bt = document.getElementById("btnVoz");
+  let timer = null;
+  const inicia = ()=>{ timer = setTimeout(()=>{ timer=null; abrirModoCarro(); }, 550); };
+  const cancela = ()=>{ if(timer){ clearTimeout(timer); timer=null; } };
+  bt.addEventListener("pointerdown", inicia);
+  ["pointerup","pointerleave","pointercancel"].forEach(e=>bt.addEventListener(e, cancela));
+  bt.addEventListener("contextmenu", e=>e.preventDefault());
+})();
 document.getElementById("btnVoz").onclick = ()=>{
+  if(document.getElementById("modoCarro").classList.contains("aberta")) return;
   aviso("Fale a tarefa. Ex.: “amanhã às 14h revisar antenas da fazenda, urgente, IGRO”.", 4000);
   Voz.ouvir(texto=>{
     const t = interpretar(texto);
@@ -1459,17 +1766,46 @@ document.getElementById("btnVoz").onclick = ()=>{
     document.getElementById("fFreq").value = rascunho.repete.freq;
     document.getElementById("fIntervalo").value = rascunho.repete.intervalo;
     atualizarRepete(); atualizarDips();
-    if(!t._temData){
-      Voz.falar("Para quando?");
-      setTimeout(()=>Voz.ouvir(resp=>{
-        const d = interpretar(resp);
-        if(d.data){ rascunho.data=d.data; document.getElementById("fData").value=d.data; }
-        if(d.hora){ rascunho.hora=d.hora; document.getElementById("fHora").value=d.hora; }
-        atualizarDips();
-      }), 900);
-    }
+    if(!t._temData) perguntarQuando();
   });
 };
+/* pergunta a data por voz e, ao mesmo tempo, mostra atalhos de toque —
+   o reconhecimento encadeado falha com frequência no Android */
+function perguntarQuando(){
+  const box = document.getElementById("atalhosData");
+  box.hidden = false;
+  Voz.perguntar("Para quando?", resp=>{
+    const d = interpretar(resp);
+    if(d.data){ rascunho.data=d.data; document.getElementById("fData").value=d.data; }
+    if(d.hora){ rascunho.hora=d.hora; document.getElementById("fHora").value=d.hora; }
+    if(d.data || d.hora){ box.hidden = true; aviso("Anotado: "+rotuloData(rascunho.data)+(rascunho.hora?" "+rascunho.hora:"")); }
+    atualizarDips();
+  });
+}
+function montarAtalhosData(){
+  const box = document.getElementById("atalhosData");
+  box.innerHTML = "";
+  const opcoes = [
+    ["Hoje", ()=>hojeISO()],
+    ["Amanhã", ()=>somaDias(hojeISO(),1)],
+    ["Semana que vem", ()=>somaDias(hojeISO(),7)],
+    ["🎙 Falar de novo", null]
+  ];
+  opcoes.forEach(([rot, fn])=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="atalho-data";
+    b.textContent = rot;
+    b.onclick = ()=>{
+      if(!fn){ perguntarQuando(); return; }
+      Voz.parar();
+      rascunho.data = fn();
+      document.getElementById("fData").value = rascunho.data;
+      box.hidden = true;
+      atualizarDips();
+    };
+    box.appendChild(b);
+  });
+}
 
 /* interpretador pt-BR */
 function interpretar(txt){
@@ -1652,50 +1988,61 @@ document.getElementById("btnSalvarContato").onclick = ()=>{
 };
 document.getElementById("btnNovoContato").onclick = ()=>abrirContato(null);
 
-/* agenda do telefone (Contact Picker API) */
-async function buscarNaAgenda(){
+/* agenda do telefone (Contact Picker API)
+   ATENÇÃO: select() precisa ser chamado no mesmo "toque" do usuário.
+   Qualquer await antes dele descarta a ativação e o Android recusa em silêncio. */
+function buscarNaAgenda(){
   const nota = document.getElementById("notaAgenda");
-  if(!("contacts" in navigator) || !navigator.contacts.select){
-    nota.textContent = "A agenda do telefone só abre no Chrome/Android com o app servido por HTTPS. Abrindo o arquivo direto (file://) o navegador bloqueia — cadastre pelo botão +.";
-    aviso("Agenda indisponível aqui. Use o + para cadastrar.", 4200);
+  const temAPI = ("contacts" in navigator) && navigator.contacts && navigator.contacts.select;
+  if(!temAPI){
+    const motivo = (location.protocol!=="https:") ? "o app não está em HTTPS"
+      : (window.self!==window.top) ? "a página está dentro de outro app"
+      : /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "o Safari do iPhone não tem essa função"
+      : !/Chrome/i.test(navigator.userAgent) ? "este navegador não tem essa função — use o Chrome"
+      : "o navegador não liberou o acesso";
+    nota.innerHTML = "Agenda indisponível: "+motivo+". Use “+ Novo contato”.";
+    aviso("Agenda indisponível: "+motivo+".", 5500);
     return;
   }
-  try{
-    const props = await navigator.contacts.getProperties();
-    const pedir = ["name","tel"].concat(props.includes("email") ? ["email"] : []);
-    const sel = await navigator.contacts.select(pedir, {multiple:true});
-    if(!sel || !sel.length) return;
-
-    if(sel.length===1){
-      const c = sel[0];
-      abrirContato(null, {
-        nome: (c.name && c.name[0]) || "",
-        tel:  (c.tel && c.tel[0]) || "",
-        email:(c.email && c.email[0]) || ""
+  /* chamada síncrona, sem await antes */
+  navigator.contacts.select(["name","tel"], {multiple:true})
+    .then(sel=>{
+      if(!sel || !sel.length) return;
+      if(sel.length===1){
+        const c = sel[0];
+        abrirContato(null, {
+          nome: (c.name && c.name[0]) || "",
+          tel:  (c.tel && c.tel[0]) || ""
+        });
+        return;
+      }
+      let novos = 0, repetidos = 0;
+      sel.forEach(c=>{
+        const nome = (c.name && c.name[0]) || "";
+        const tel = normalizarTelefone((c.tel && c.tel[0]) || "");
+        if(!nome) return;
+        if(tel && S.pessoas.some(p=>p.tel===tel)){ repetidos++; return; }
+        S.pessoas.push({
+          id:"p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+          nome, tel, email:"", papel:"executa",
+          criadoEm:new Date().toISOString(), atualizadoEm:new Date().toISOString()
+        });
+        novos++;
       });
-      return;
-    }
-    let novos = 0;
-    sel.forEach(c=>{
-      const nome = (c.name && c.name[0]) || "";
-      const tel = normalizarTelefone((c.tel && c.tel[0]) || "");
-      if(!nome) return;
-      if(S.pessoas.some(p=>p.tel && p.tel===tel && tel)) return;
-      S.pessoas.push({
-        id:"p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-        nome, tel, email:(c.email && c.email[0])||"", papel:"executa",
-        criadoEm:new Date().toISOString()
-      });
-      novos++;
+      salvar();
+      renderChipsPessoas();
+      renderCfg();
+      aviso(novos+" contatos importados"+(repetidos?" ("+repetidos+" já existiam)":"")+".", 4000);
+    })
+    .catch(e=>{
+      const nm = (e && e.name) || "erro";
+      const msg = nm==="SecurityError"
+        ? "O Android exigiu que a agenda abrisse direto pelo toque. Toque no botão novamente."
+        : nm==="NotAllowedError" ? "Permissão de contatos negada. Libere nas configurações do Chrome."
+        : nm==="AbortError" ? ""
+        : "Não consegui abrir a agenda ("+nm+").";
+      if(msg){ nota.textContent = msg; aviso(msg, 5500); }
     });
-    salvar();
-    renderChipsPessoas();
-    renderCfg();
-    aviso(novos+" contatos importados da agenda.");
-  }catch(e){
-    nota.textContent = "O navegador recusou o acesso à agenda ("+(e.name||"erro")+"). Cadastre pelo botão +.";
-    aviso("Não consegui abrir a agenda.");
-  }
 }
 document.getElementById("btnAgenda").onclick = buscarNaAgenda;
 
@@ -1948,6 +2295,635 @@ document.getElementById("btnCompartilhar").onclick = async ()=>{
   try{ await navigator.share({text:txt}); registrarAviso("compartilhar"); }catch(e){}
 };
 
+/* ============ fluxo de aprovação ============ */
+/* Tudo trafega dentro do link do WhatsApp: não há servidor.
+   Pedido  →  #ap=<pacote>   (vai para quem aprova)
+   Resposta →  #ar=<pacote>  (volta para quem pediu) */
+
+function pacoteEnxuto(t){
+  return {
+    titulo:t.titulo, data:t.data, hora:t.hora, g:t.g, u:t.u, t:t.t,
+    nota:(t.nota||"").split("\n").filter(x=>!/^Origem:/.test(x)).join(" ").slice(0,220),
+    repete:t.repete, lembrete:t.lembrete, frente:catDe(t.categoria).nome
+  };
+}
+function estadoAprovacao(t){
+  const a = t.aprovacao;
+  if(!a || !a.aprovadores || !a.aprovadores.length) return null;
+  const total = a.aprovadores.length;
+  const ok = a.aprovadores.filter(x=>x.estado==="aprovado").length;
+  const nao = a.aprovadores.filter(x=>x.estado==="recusado").length;
+  const sug = a.aprovadores.filter(x=>x.estado==="contraproposta").length;
+  if(nao) return {tipo:"recusado", ok, nao, sug, total};
+  if(sug) return {tipo:"sugerido", ok, nao, sug, total};
+  if(ok===total) return {tipo:"aprovado", ok, nao, sug, total};
+  return {tipo:"pendente", ok, nao, sug, total};
+}
+
+let pedirTarefa = null;
+const pedirSelecao = new Set();
+function abrirPedirAprovacao(t){
+  pedirTarefa = t;
+  pedirSelecao.clear();
+  (t.aprovacao && t.aprovacao.aprovadores || []).forEach(a=>{ if(a.pessoaId) pedirSelecao.add(a.pessoaId); });
+  if(!pedirSelecao.size) pessoasDaTarefa(t).forEach(id=>pedirSelecao.add(id));
+  const p = pontuacao(t);
+  const prev = document.getElementById("pedirPrevia");
+  prev.style.setProperty("--cor-prio", corFaixa(faixa(p)));
+  prev.innerHTML = '<div><div class="rot">'+escapar(t.titulo.slice(0,60))+'</div>'
+    + '<div class="conta">'+(t.data?rotuloLongo(t):"sem data")+' · '+escapar(catDe(t.categoria).nome)+'</div></div>'
+    + '<div class="val">'+p+'</div>';
+  document.getElementById("pedirRecado").value = "";
+  document.getElementById("pedirMeuTel").value = S.config.meuTelefone ? telBonito(S.config.meuTelefone) : "";
+  renderPedirPessoas();
+  document.getElementById("folhaPedir").classList.add("aberta");
+}
+function renderPedirPessoas(){
+  const box = document.getElementById("pedirPessoas");
+  box.innerHTML = "";
+  if(!S.pessoas.length){
+    box.innerHTML = '<div class="vazio-mini">Nenhum contato. Use a agenda ou cadastre um contato abaixo.</div>';
+    return;
+  }
+  S.pessoas.forEach(p=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="sel-pessoa";
+    b.setAttribute("aria-pressed", pedirSelecao.has(p.id) ? "true":"false");
+    b.innerHTML = '<span class="ini">'+iniciais(p.nome)+'</span>';
+    b.appendChild(document.createTextNode(p.nome));
+    b.onclick = ()=>{
+      if(pedirSelecao.has(p.id)) pedirSelecao.delete(p.id); else pedirSelecao.add(p.id);
+      renderPedirPessoas();
+    };
+    box.appendChild(b);
+  });
+}
+document.getElementById("pedirNovo").onclick = ()=>abrirContato(null);
+document.getElementById("pedirAgenda").onclick = ()=>buscarNaAgenda();
+
+document.getElementById("pedirEnviar").onclick = ()=>{
+  const t = pedirTarefa;
+  if(!t) return;
+  if(!pedirSelecao.size){ aviso("Marque ao menos uma pessoa para aprovar."); return; }
+  const meuTel = normalizarTelefone(document.getElementById("pedirMeuTel").value);
+  if(!telValido(meuTel)){ aviso("Informe seu número com DDD — é por ele que a resposta volta."); return; }
+  S.config.meuTelefone = meuTel;
+  const recado = document.getElementById("pedirRecado").value.trim();
+  const nomeQuem = (S.config.assinatura||"").split("—")[0].trim() || "quem enviou";
+
+  const versao = ((t.aprovacao && t.aprovacao.versao) || 0) + 1;
+  t.aprovacao = {
+    solicitada: new Date().toISOString(),
+    versao, recado,
+    aprovadores: Array.from(pedirSelecao).map(id=>{
+      const p = pessoaDe(id);
+      return {pessoaId:id, nome:p?p.nome:"", tel:p?p.tel:"", estado:"pendente", quando:null, justificativa:"", sugestao:""};
+    })
+  };
+  tocar(t); salvar(); renderTudo();
+
+  const alvos = t.aprovacao.aprovadores.slice();
+  fecharFolhas();
+  enviarPedidos(t, alvos, 0, nomeQuem, meuTel, versao, recado);
+};
+/* um WhatsApp por aprovador, em sequência */
+function enviarPedidos(t, alvos, i, nomeQuem, meuTel, versao, recado){
+  if(i >= alvos.length){
+    aviso("Pedidos enviados. Quando responderem, é só abrir o link que voltar.", 6000);
+    return;
+  }
+  const a = alvos[i];
+  const pacote = {
+    tipo:"aprov-req", v:1, req:t.id+"#"+versao,
+    de:{nome:nomeQuem, tel:meuTel},
+    tarefa: pacoteEnxuto(t),
+    recado
+  };
+  const url = baseDoApp() + "#ap=" + b64enc(JSON.stringify(pacote));
+  const txt = "Oi "+primeiroNome({nome:a.nome})+", preciso da sua aprovação:\n\n"
+    + "*"+t.titulo+"*\n"
+    + "📅 "+(t.data?rotuloLongo(t):"sem data")+"\n"
+    + (recado ? "\n"+recado+"\n" : "")
+    + "\nAbra para aprovar ou recusar:\n" + url;
+  const tel = normalizarTelefone(a.tel);
+  window.open("https://wa.me/"+(telValido(tel)?tel:"")+"?text="+encodeURIComponent(txt), "_blank");
+  if(alvos.length>1){
+    setTimeout(()=>{
+      if(confirm("Enviar o pedido para "+primeiroNome({nome:alvos[i+1] ? alvos[i+1].nome : ""})+" também?"))
+        enviarPedidos(t, alvos, i+1, nomeQuem, meuTel, versao, recado);
+    }, 1500);
+  }
+}
+function baseDoApp(){
+  return (location.origin && location.origin!=="null")
+    ? location.origin + location.pathname.replace(/[^/]*$/,"") + "index.html"
+    : "";
+}
+
+/* ---- lado de quem recebe o pedido ---- */
+let apPedido = null;
+function abrirAprovacao(pacote){
+  apPedido = pacote;
+  const t = pacote.tarefa;
+  document.getElementById("aprovarTitulo").textContent = (pacote.de && pacote.de.nome ? pacote.de.nome : "Alguém") + " pediu sua aprovação";
+  const quando = t.data
+    ? (function(){ const d=deISO(t.data); return DIAS_ABREV[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+(t.hora?" às "+t.hora:""); })()
+    : "sem data";
+  const gut = (t.g||3)*(t.u||3)*(t.t||3);
+  document.getElementById("aprovarCorpo").innerHTML =
+    '<div class="ap-dados">'
+    + '<div class="rot">Tarefa</div><div style="font-weight:600;font-size:17px">'+escapar(t.titulo)+'</div>'
+    + '<div class="rot" style="margin-top:9px">Quando</div><div>'+escapar(quando)+'</div>'
+    + (t.frente ? '<div class="rot" style="margin-top:9px">Frente</div><div>'+escapar(t.frente)+'</div>' : '')
+    + '<div class="rot" style="margin-top:9px">Prioridade</div><div>'+gut+'</div>'
+    + (t.nota ? '<div class="rot" style="margin-top:9px">Observações</div><div>'+escapar(t.nota)+'</div>' : '')
+    + '</div>'
+    + (pacote.recado ? '<div class="painel-ap"><b>Recado</b>'+escapar(pacote.recado)+'</div>' : '')
+    + '<div class="nota">Ao aprovar, a tarefa entra na sua agenda com alarme e a resposta volta pelo WhatsApp.</div>';
+  document.getElementById("aprovarBotoes").hidden = false;
+  document.getElementById("aprovarRecusa").hidden = true;
+  document.getElementById("aprovarMotivo").value = "";
+  document.getElementById("aprovarSugestao").hidden = true;
+  document.getElementById("sugMotivo").value = "";
+  ["sug1Data","sug1Hora","sug2Data","sug2Hora"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("folhaAprovar").classList.add("aberta");
+}
+document.getElementById("btnAprovar").onclick = ()=>{
+  const p = apPedido; if(!p) return;
+  const e = p.tarefa;
+  const t = novaTarefa();
+  t.titulo = e.titulo;
+  t.data = e.data || hojeISO();
+  t.hora = e.hora || "";
+  t.g = e.g||3; t.u = e.u||3; t.t = e.t||3;
+  t.nota = (e.nota||"") + (p.de && p.de.nome ? "\nAprovado para "+p.de.nome : "");
+  t.repete = e.repete || t.repete;
+  t.lembrete = (e.lembrete===""||e.lembrete==null) ? 30 : e.lembrete;
+  t.origem = "aprovação de "+((p.de&&p.de.nome)||"terceiro");
+  S.tarefas.push(t);
+  gravarAgora(); renderTudo();
+  responderAprovacao(p, "aprovado", "", "");
+  fecharFolhas();
+  aviso("Aprovado e agendado com alarme para "+rotuloData(t.data)+".", 6000);
+  if(t.data){
+    setTimeout(()=>{
+      if(confirm("Adicionar também ao Google Agenda do seu celular?")) window.open(linkGoogleAgenda(t), "_blank");
+    }, 1200);
+  }
+};
+document.getElementById("btnSugerir").onclick = ()=>{
+  document.getElementById("aprovarBotoes").hidden = true;
+  document.getElementById("aprovarSugestao").hidden = false;
+  const orig = apPedido && apPedido.tarefa ? apPedido.tarefa : {};
+  const d1 = document.getElementById("sug1Data");
+  if(!d1.value) d1.value = orig.data ? somaDias(orig.data, 1) : somaDias(hojeISO(),1);
+  const h1 = document.getElementById("sug1Hora");
+  if(!h1.value) h1.value = orig.hora || "";
+};
+document.getElementById("sugVoltar").onclick = ()=>{
+  document.getElementById("aprovarBotoes").hidden = false;
+  document.getElementById("aprovarSugestao").hidden = true;
+};
+document.getElementById("sugEnviar").onclick = ()=>{
+  const d1 = document.getElementById("sug1Data").value;
+  if(!d1){ aviso("Preencha ao menos a primeira opção de data."); return; }
+  const opcoes = [{data:d1, hora:document.getElementById("sug1Hora").value}];
+  const d2 = document.getElementById("sug2Data").value;
+  if(d2) opcoes.push({data:d2, hora:document.getElementById("sug2Hora").value});
+  const motivo = document.getElementById("sugMotivo").value.trim();
+  responderAprovacao(apPedido, "contraproposta", motivo, "", opcoes);
+  fecharFolhas();
+  aviso("Sugestões enviadas. Quem pediu escolhe uma delas.", 6000);
+};
+document.getElementById("btnRecusar").onclick = ()=>{
+  document.getElementById("aprovarBotoes").hidden = true;
+  document.getElementById("aprovarRecusa").hidden = false;
+  document.getElementById("aprovarMotivo").focus();
+};
+document.getElementById("recusaVoltar").onclick = ()=>{
+  document.getElementById("aprovarBotoes").hidden = false;
+  document.getElementById("aprovarRecusa").hidden = true;
+};
+document.getElementById("recusaEnviar").onclick = ()=>{
+  const motivo = document.getElementById("aprovarMotivo").value.trim();
+  if(motivo.length < 4){ aviso("Escreva o motivo — é ele que volta para quem pediu."); return; }
+  responderAprovacao(apPedido, "recusado", motivo, "", []);
+  fecharFolhas();
+  aviso("Recusa enviada com a justificativa.", 5000);
+};
+function responderAprovacao(p, estado, motivo, sugestao, opcoes){
+  const quem = (S.config.assinatura||"").split("—")[0].trim() || "";
+  const resp = {
+    tipo:"aprov-resp", v:1, req:p.req,
+    estado, por:quem, quando:new Date().toISOString(),
+    justificativa:motivo||"", sugestao:sugestao||"",
+    opcoes: opcoes||[],
+    titulo:p.tarefa.titulo
+  };
+  const url = baseDoApp() + "#ar=" + b64enc(JSON.stringify(resp));
+  let txt;
+  if(estado==="aprovado"){
+    txt = "✅ Aprovado: *"+p.tarefa.titulo+"*\nJá está na minha agenda.\n\nRegistrar no seu painel:\n"+url;
+  } else if(estado==="contraproposta"){
+    const lista = (opcoes||[]).map((o,i)=>"  "+(i+1)+") "+rotuloExtenso(o.data)+(o.hora?" às "+o.hora:"")).join("\n");
+    txt = "📅 Podemos remarcar? *"+p.tarefa.titulo+"*\n\n"
+      + "Sugiro:\n"+lista+"\n"
+      + (motivo ? "\n"+motivo+"\n" : "")
+      + "\nEscolha uma delas aqui:\n"+url;
+  } else {
+    txt = "❌ Não vai dar: *"+p.tarefa.titulo+"*\n\nMotivo: "+motivo
+      + "\n\nRegistrar no seu painel:\n"+url;
+  }
+  const tel = normalizarTelefone(p.de && p.de.tel);
+  window.open("https://wa.me/"+(telValido(tel)?tel:"")+"?text="+encodeURIComponent(txt), "_blank");
+}
+function rotuloExtenso(iso){
+  if(!iso) return "sem data";
+  const d = deISO(iso);
+  const semana = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+  return semana[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0");
+}
+
+/* ---- lado de quem pediu: recebe a resposta ---- */
+function registrarResposta(resp){
+  const [idTarefa, versao] = String(resp.req||"").split("#");
+  const t = S.tarefas.find(x=>x.id===idTarefa);
+  if(!t){ aviso("Não achei essa tarefa neste aparelho. A resposta era: "+(resp.estado==="aprovado"?"aprovada":"recusada")+".", 8000); return; }
+  if(!t.aprovacao) t.aprovacao = {versao:Number(versao)||1, aprovadores:[]};
+  const nome = (resp.por||"").trim();
+  let alvo = t.aprovacao.aprovadores.find(a=>nome && a.nome && a.nome.toLowerCase().includes(nome.toLowerCase().split(" ")[0]));
+  if(!alvo) alvo = t.aprovacao.aprovadores.find(a=>a.estado==="pendente");
+  if(!alvo){
+    alvo = {pessoaId:null, nome:nome||"terceiro", tel:"", estado:"pendente", quando:null, justificativa:"", sugestao:""};
+    t.aprovacao.aprovadores.push(alvo);
+  }
+  alvo.estado = resp.estado;
+  alvo.quando = resp.quando || new Date().toISOString();
+  alvo.justificativa = resp.justificativa || "";
+  alvo.sugestao = resp.sugestao || "";
+  alvo.opcoes = resp.opcoes || [];
+  if(resp.estado==="recusado" && resp.sugestao) t.aprovacao.sugestaoData = resp.sugestao;
+  tocar(t); gravarAgora(); renderTudo();
+
+  if(resp.estado==="contraproposta"){
+    abrirEscolhaData(t, alvo);
+    return;
+  }
+  const st = estadoAprovacao(t);
+  if(resp.estado==="aprovado"){
+    bip();
+    aviso("✅ "+(alvo.nome||"Aprovado")+" aprovou “"+t.titulo.slice(0,30)+"”"
+      + (st.tipo==="aprovado" ? " — todos aprovaram." : " ("+st.ok+"/"+st.total+")"), 7000);
+  } else {
+    aviso("❌ "+(alvo.nome||"Recusado")+": "+(resp.justificativa||"sem motivo"), 10000);
+    setTimeout(()=>{
+      if(confirm("“"+t.titulo+"” foi recusada.\n\nMotivo: "+(resp.justificativa||"—")
+        + "\n\nAbrir para alterar e reenviar?")){
+        abrirForm(t);
+      }
+    }, 900);
+  }
+}
+/* quem pediu escolhe entre as datas propostas */
+function abrirEscolhaData(t, alvo){
+  document.getElementById("escolhaTitulo").textContent =
+    (alvo.nome ? primeiroNome({nome:alvo.nome}) : "Quem recebeu") + " sugeriu outra data";
+  const box = document.getElementById("escolhaCorpo");
+  box.innerHTML = "";
+
+  const cab = document.createElement("div");
+  cab.className = "painel-ap";
+  cab.innerHTML = "<b>"+escapar(t.titulo)+"</b>Marcada para "+(t.data?rotuloLongo(t):"sem data")
+    + (alvo.justificativa ? '<div class="ap-motivo">'+escapar(alvo.justificativa)+'</div>' : "");
+  box.appendChild(cab);
+
+  const rot = document.createElement("div");
+  rot.className = "rotulo"; rot.textContent = "Escolha uma";
+  box.appendChild(rot);
+
+  const menu = document.createElement("div");
+  menu.className = "menu-acoes";
+  (alvo.opcoes||[]).forEach((o,i)=>{
+    const b = document.createElement("button");
+    b.innerHTML = '<span class="ic">'+(i+1)+'</span><span>'+escapar(rotuloExtenso(o.data))
+      + (o.hora ? " às "+o.hora : "")
+      + '<span class="sub">'+escapar(rotuloData(o.data))+'</span></span>';
+    b.onclick = ()=>aceitarSugestao(t, alvo, o);
+    menu.appendChild(b);
+  });
+  const manter = document.createElement("button");
+  manter.innerHTML = '<span class="ic">↩︎</span><span>Manter '+escapar(t.data?rotuloData(t.data):"como está")
+    + '<span class="sub">Reenviar o pedido sem mudar a data</span></span>';
+  manter.onclick = ()=>{
+    fecharFolhas();
+    aviso("Data mantida. Reenvie pelo toque longo → Pedir aprovação.", 5000);
+  };
+  menu.appendChild(manter);
+
+  const outra = document.createElement("button");
+  outra.innerHTML = '<span class="ic">✏️</span><span>Escolher outra data<span class="sub">Abrir a tarefa para editar</span></span>';
+  outra.onclick = ()=>{ fecharFolhas(); abrirForm(t); };
+  menu.appendChild(outra);
+
+  box.appendChild(menu);
+  document.getElementById("folhaEscolha").classList.add("aberta");
+}
+function aceitarSugestao(t, alvo, opcao){
+  t.data = opcao.data;
+  if(opcao.hora) t.hora = opcao.hora;
+  alvo.estado = "aprovado";
+  alvo.quando = new Date().toISOString();
+  alvo.justificativa = (alvo.justificativa ? alvo.justificativa+" — " : "") + "data acertada por sugestão";
+  tocar(t); gravarAgora(); renderTudo();
+  fecharFolhas();
+  bip();
+  const st = estadoAprovacao(t);
+  aviso("Remarcada para "+rotuloLongo(t)+(st.tipo==="aprovado"?" — aprovada.":" ("+st.ok+"/"+st.total+")"), 6000);
+  /* confirma para a pessoa que a sugestão dela foi aceita */
+  setTimeout(()=>{
+    const tel = normalizarTelefone(alvo.tel);
+    const txt = "👍 Fechado: *"+t.titulo+"*\n📅 "+rotuloExtenso(t.data)+(t.hora?" às "+t.hora:"")
+      + "\n\nObrigado pelo retorno."
+      + (S.config.assinatura ? "\n\n"+S.config.assinatura : "");
+    if(confirm("Avisar "+primeiroNome({nome:alvo.nome})+" que a data dele foi aceita?")){
+      window.open("https://wa.me/"+(telValido(tel)?tel:"")+"?text="+encodeURIComponent(txt), "_blank");
+    }
+  }, 900);
+}
+
+/* ============ toque longo, seleção e compartilhamento ============ */
+let modoSelecao = false;
+const selecionadas = new Set();
+
+function ligarToqueLongo(el, t){
+  let timer = null, moveu = false, x0 = 0, y0 = 0;
+  const limpar = ()=>{ if(timer){ clearTimeout(timer); timer=null; } el.classList.remove("press"); };
+  el.addEventListener("pointerdown", e=>{
+    if(e.target.closest(".pega") || e.target.closest("button")) return;
+    moveu = false; x0 = e.clientX; y0 = e.clientY;
+    el.classList.add("press");
+    timer = setTimeout(()=>{
+      timer = null;
+      el.classList.remove("press");
+      if(moveu) return;
+      if(navigator.vibrate) try{ navigator.vibrate(18); }catch(err){}
+      if(modoSelecao) alternarSelecao(t);
+      else abrirAcoesTarefa(t);
+    }, 500);
+  });
+  el.addEventListener("pointermove", e=>{
+    if(Math.abs(e.clientX-x0)>10 || Math.abs(e.clientY-y0)>10){ moveu = true; limpar(); }
+  });
+  ["pointerup","pointerleave","pointercancel"].forEach(ev=>el.addEventListener(ev, limpar));
+  el.addEventListener("contextmenu", e=>e.preventDefault());
+}
+
+function alternarSelecao(t){
+  if(selecionadas.has(t.id)) selecionadas.delete(t.id);
+  else selecionadas.add(t.id);
+  if(!selecionadas.size) sairSelecao();
+  else { modoSelecao = true; atualizarBarraSelecao(); renderTudo(); }
+}
+function entrarSelecao(t){
+  modoSelecao = true;
+  selecionadas.clear();
+  if(t) selecionadas.add(t.id);
+  atualizarBarraSelecao(); renderTudo();
+  aviso("Toque nas tarefas para marcar.", 3000);
+}
+function sairSelecao(){
+  modoSelecao = false; selecionadas.clear();
+  atualizarBarraSelecao(); renderTudo();
+}
+function atualizarBarraSelecao(){
+  const b = document.getElementById("barraSelecao");
+  b.hidden = !modoSelecao;
+  document.getElementById("selConta").textContent =
+    selecionadas.size + (selecionadas.size===1 ? " selecionada" : " selecionadas");
+}
+document.getElementById("selCancelar").onclick = sairSelecao;
+document.getElementById("selTodas").onclick = ()=>{
+  const abertas = ordenar(visiveis().filter(x=>!x.concluida));
+  const todas = abertas.every(x=>selecionadas.has(x.id));
+  selecionadas.clear();
+  if(!todas) abertas.forEach(x=>selecionadas.add(x.id));
+  if(!selecionadas.size) sairSelecao();
+  else { atualizarBarraSelecao(); renderTudo(); }
+};
+document.getElementById("selCompartilhar").onclick = ()=>{
+  const lista = S.tarefas.filter(x=>selecionadas.has(x.id));
+  if(!lista.length){ aviso("Marque ao menos uma tarefa."); return; }
+  compartilharTarefas(lista);
+};
+
+/* texto legível de uma ou várias tarefas */
+function textoDeTarefas(lista, comConvite){
+  const linhas = [];
+  if(lista.length>1){
+    linhas.push("*Tarefas — Painel GUT*");
+    linhas.push("");
+  }
+  ordenar(lista).forEach(t=>{
+    const quando = (t.data ? rotuloLongo(t) : "sem data");
+    const atr = diasAtraso(t);
+    const cat = catDe(t.categoria).nome;
+    const marca = faixa(pontuacao(t))==="alta" ? "🔴" : faixa(pontuacao(t))==="media" ? "🟡" : "🟢";
+    if(lista.length>1){
+      linhas.push(marca+" *"+t.titulo+"*");
+      linhas.push("   "+quando + (atr>0 ? "  ·  "+atr+" d de atraso" : "") + "  ·  "+cat);
+    } else {
+      linhas.push("*"+t.titulo+"*");
+      linhas.push("");
+      linhas.push("📅 "+quando);
+      if(atr>0) linhas.push("⚠️ "+atr+" dia"+(atr>1?"s":"")+" de atraso");
+      linhas.push("🏷️ "+cat);
+      linhas.push("📊 Prioridade "+pontuacao(t)+" ("+(faixa(pontuacao(t))==="alta"?"alta":faixa(pontuacao(t))==="media"?"média":"baixa")+")");
+      const ps = pessoasDaTarefa(t).map(pessoaDe).filter(Boolean);
+      if(ps.length) linhas.push("👤 "+ps.map(p=>p.nome).join(", "));
+      if(t.nota){
+        const n = t.nota.split("\n").filter(x=>x.trim() && !/^Origem:/.test(x)).join(" ").slice(0,180);
+        if(n) linhas.push("📝 "+n);
+      }
+    }
+  });
+  if(lista.length>1) linhas.push("\n_"+lista.length+" tarefas_");
+  if(S.config.assinatura) linhas.push("\n"+S.config.assinatura);
+  if(comConvite && lista.length===1 && lista[0].data){
+    linhas.push(trechoConvite(lista[0]));
+  }
+  return linhas.join("\n").replace(/\n{3,}/g,"\n\n");
+}
+async function compartilharTarefas(lista, comConvite){
+  const txt = textoDeTarefas(lista, comConvite);
+  if(navigator.share){
+    try{
+      await navigator.share({text:txt, title: lista.length===1 ? lista[0].titulo : lista.length+" tarefas"});
+      lista.forEach(t=>{
+        t.avisos = t.avisos||[];
+        t.avisos.push({quando:new Date().toISOString(), canal:"compartilhado", pessoaId:null, modelo:"lista"});
+        tocar(t);
+      });
+      salvar();
+      if(modoSelecao) sairSelecao(); else renderTudo();
+      return;
+    }catch(e){ if(e && e.name==="AbortError") return; }
+  }
+  window.open("https://wa.me/?text="+encodeURIComponent(txt), "_blank");
+  if(modoSelecao) sairSelecao();
+  aviso("WhatsApp aberto — escolha para quem enviar.");
+}
+
+/* menu do toque longo */
+function abrirAcoesTarefa(t){
+  document.getElementById("acoesTitulo").textContent = t.titulo.slice(0,44) + (t.titulo.length>44?"…":"");
+  const box = document.getElementById("menuAcoes");
+  box.innerHTML = "";
+  const ps = pessoasDaTarefa(t).map(pessoaDe).filter(Boolean);
+  const itens = [
+    ["📲","Compartilhar no WhatsApp","Manda o texto da tarefa para qualquer contato",
+      ()=>{ fecharFolhas(); compartilharTarefas([t], false); }],
+    ["📅","Compartilhar com convite","Inclui link para a pessoa salvar na agenda com alarme",
+      ()=>{ fecharFolhas(); compartilharTarefas([t], true); }, !!t.data],
+    ["💬","Avisar / cobrar",(ps.length ? "Mensagem pronta para "+ps.map(primeiroNome).join(", ") : "Escolher modelo de mensagem"),
+      ()=>{ fecharFolhas(); abrirMensagem(t, diasAtraso(t)>0 ? "cobrar" : "aviso"); }],
+    ["📤","Enviar como tarefa","A pessoa recebe e adiciona no app dela",
+      ()=>{ fecharFolhas(); abrirMensagem(t, "delegar"); }],
+    ["🖐️", (t.aprovacao && estadoAprovacao(t) && estadoAprovacao(t).tipo==="recusado") ? "Corrigir e reenviar para aprovação" : "Pedir aprovação",
+      (function(){ const st=estadoAprovacao(t);
+        if(!st) return "Enviar pelo WhatsApp para alguém aprovar";
+        if(st.tipo==="pendente") return "Aguardando "+(st.total-st.ok)+" de "+st.total;
+        if(st.tipo==="aprovado") return "Aprovada por todos — reenviar se mudou";
+        if(st.tipo==="sugerido") return "Sugeriram outra data — ver e decidir";
+        return "Recusada — ver motivo e reenviar"; })(),
+      ()=>{ fecharFolhas(); abrirPedirAprovacao(t); }],
+    ["☑️","Selecionar várias","Marcar mais tarefas e mandar tudo junto",
+      ()=>{ fecharFolhas(); entrarSelecao(t); }],
+    ["✏️","Editar","", ()=>{ fecharFolhas(); abrirForm(t); }],
+    ["📋","Duplicar","", ()=>{
+        const c = JSON.parse(JSON.stringify(t));
+        c.id = "t_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+        c.titulo = t.titulo+" (cópia)";
+        c.concluida=false; c.concluidaEm=null; c.avisos=[]; c.fixada=false;
+        c.criadaEm=new Date().toISOString(); c.atualizadoEm=c.criadaEm;
+        S.tarefas.push(c); salvar(); fecharFolhas(); renderTudo(); aviso("Tarefa duplicada.");
+      }],
+    [t.concluida?"↩️":"✅", t.concluida?"Reabrir":"Marcar como feita","",
+      ()=>{ fecharFolhas(); concluir(t); }],
+    ["🗑️","Excluir","", ()=>{
+        if(!confirm("Excluir “"+t.titulo+"”?")) return;
+        registrarRemocao("tarefa", t.id);
+        S.tarefas = S.tarefas.filter(x=>x.id!==t.id);
+        salvar(); fecharFolhas(); renderTudo(); aviso("Tarefa excluída.");
+      }, true, "perigo"]
+  ];
+  itens.forEach(it=>{
+    const [ic, rot, sub, fn, cond, classe] = it;
+    if(cond === false) return;
+    const b = document.createElement("button");
+    if(classe) b.className = classe;
+    b.innerHTML = '<span class="ic">'+ic+'</span><span>'+escapar(rot)
+      + (sub ? '<span class="sub">'+escapar(sub)+'</span>' : '')+'</span>';
+    b.onclick = fn;
+    box.appendChild(b);
+  });
+  document.getElementById("folhaAcoes").classList.add("aberta");
+}
+
+/* ============ modo carro ============ */
+let carroRascunho = null;
+function carroDiz(estado, texto, sub){
+  document.getElementById("carroEstado").textContent = estado;
+  document.getElementById("carroTexto").innerHTML =
+    escapar(texto) + (sub ? '<span class="quando">'+escapar(sub)+'</span>' : "");
+}
+function carroAlvoClasse(c){
+  const a = document.getElementById("carroAlvo");
+  a.classList.remove("ouvindo","pensando");
+  if(c) a.classList.add(c);
+}
+function abrirModoCarro(){
+  document.getElementById("modoCarro").classList.add("aberta");
+  document.getElementById("carroAcoes").hidden = true;
+  carroRascunho = null;
+  carroDiz("Toque para falar", "Diga a tarefa e quando", "");
+  carroAlvoClasse("");
+  try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
+  /* se o microfone já foi liberado antes, começa sozinho */
+  if(navigator.permissions && navigator.permissions.query){
+    navigator.permissions.query({name:"microphone"})
+      .then(p=>{ if(p.state==="granted") setTimeout(carroEscutar, 500); })
+      .catch(()=>{});
+  }
+}
+function fecharModoCarro(){
+  Voz.parar();
+  try{ speechSynthesis.cancel(); }catch(e){}
+  document.getElementById("modoCarro").classList.remove("aberta");
+  carroRascunho = null;
+}
+function carroEscutar(){
+  document.getElementById("carroAcoes").hidden = true;
+  carroAlvoClasse("ouvindo");
+  carroDiz("Escutando…", "Fale agora", "");
+  Voz.ouvir(texto=>{
+    carroAlvoClasse("pensando");
+    const c = interpretar(texto);
+    carroRascunho = c;
+    const quando = (c.data ? rotuloData(c.data) : "sem data") + (c.hora ? " às "+c.hora : "");
+    carroDiz("Confere?", c.titulo, quando);
+    document.getElementById("carroAcoes").hidden = false;
+    Voz.falar("Anotei: "+c.titulo+", "+quando+". Salvar?", ()=>carroConfirmar());
+  });
+}
+/* escuta só a confirmação; qualquer coisa fora do esperado mantém os botões na tela */
+function carroConfirmar(){
+  carroAlvoClasse("ouvindo");
+  Voz.ouvir(resp=>{
+    const r = " "+resp.toLowerCase()+" ";
+    if(/\b(sim|salvar|salva|confirma|confirmar|isso|ok|pode|certo|positivo)\b/.test(r)){ carroSalvar(); return; }
+    if(/\b(n[ãa]o|cancela|cancelar|apaga|errado|de novo|repetir|refazer)\b/.test(r)){
+      Voz.falar("Ok, fale de novo.", ()=>carroEscutar());
+      return;
+    }
+    carroAlvoClasse("");
+    carroDiz("Não entendi", carroRascunho ? carroRascunho.titulo : "", "Toque em Salvar ou Falar de novo");
+  });
+}
+function carroSalvar(){
+  if(!carroRascunho){ carroEscutar(); return; }
+  const c = carroRascunho;
+  const t = novaTarefa();
+  t.titulo = c.titulo;
+  t.data = c.data || hojeISO();
+  t.hora = c.hora || "";
+  t.g = c.g||3; t.u = c.u||3; t.t = c.t||3;
+  t.categoria = c.categoria || S.categorias[0].id;
+  t.pessoaIds = c.pessoaIds || [];
+  t.repete = c.repete || t.repete;
+  t.origem = "modo carro";
+  S.tarefas.push(t);
+  gravarAgora(); renderTudo();
+  carroAlvoClasse("");
+  document.getElementById("carroAcoes").hidden = true;
+  const quando = rotuloData(t.data)+(t.hora?" às "+t.hora:"");
+  carroDiz("Salvo ✓", t.titulo, quando+" · prioridade "+pontuacao(t));
+  bip();
+  Voz.falar("Salvo.", ()=>{
+    setTimeout(()=>{
+      if(!document.getElementById("modoCarro").classList.contains("aberta")) return;
+      carroDiz("Toque para falar", "Diga a próxima tarefa", "");
+    }, 1400);
+  });
+  carroRascunho = null;
+}
+document.getElementById("carroAlvo").onclick = ()=>{
+  if(Voz.ocupado){ Voz.parar(); carroAlvoClasse(""); carroDiz("Pausado","Toque para falar",""); return; }
+  carroEscutar();
+};
+document.getElementById("carroSalvar").onclick = carroSalvar;
+document.getElementById("carroRepetir").onclick = ()=>{ Voz.parar(); carroEscutar(); };
+document.getElementById("carroSair").onclick = fecharModoCarro;
+
 /* ============ trazer de outros apps ============ */
 function b64enc(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
 function b64dec(s){
@@ -2084,16 +3060,38 @@ function abrirImportar(textoInicial, origemRot){
   document.getElementById("impResultado").innerHTML = "";
   candidatos = [];
   const est = document.getElementById("estadoShare");
-  const instalado = window.matchMedia("(display-mode: standalone)").matches;
-  const seguro = location.protocol === "https:";
-  est.innerHTML = (instalado && seguro)
-    ? "Ativo. No WhatsApp ou no e-mail use <b>Compartilhar → Painel GUT</b> e o texto chega aqui direto."
-    : "Para receber pelo botão “Compartilhar” do Android, o app precisa estar hospedado em HTTPS e instalado na tela inicial. Enquanto isso, use <b>copiar e colar</b> acima — funciona igual."
-      + ' <button id="btnPacotePWA" style="text-decoration:underline;color:var(--aco)">Baixar arquivos de hospedagem</button>';
+  est.innerHTML = diagnosticoInstalacao();
   document.getElementById("folhaImp").classList.add("aberta");
   const bp = document.getElementById("btnPacotePWA");
   if(bp) bp.onclick = baixarPacotePWA;
   if(textoInicial){ analisarTexto(origemRot); }
+}
+/* mostra exatamente qual condição falta para o "Compartilhar → Painel GUT" funcionar */
+function diagnosticoInstalacao(){
+  const https = location.protocol === "https:";
+  const instalado = window.matchMedia("(display-mode: standalone)").matches
+                 || window.navigator.standalone === true;
+  const sw = ("serviceWorker" in navigator) && !!navigator.serviceWorker.controller;
+  const android = /Android/i.test(navigator.userAgent);
+  const chrome = /Chrome/i.test(navigator.userAgent) && !/EdgA|OPR|SamsungBrowser/i.test(navigator.userAgent);
+  const marca = ok => ok ? '<span style="color:var(--baixa)">✓</span>' : '<span style="color:var(--alta)">✗</span>';
+
+  let l = '<div style="font-family:var(--mono);font-size:12px;line-height:1.9">'
+    + marca(https)+" hospedado em HTTPS<br>"
+    + marca(android)+" Android<br>"
+    + marca(chrome)+" Chrome<br>"
+    + marca(sw)+" funcionando offline<br>"
+    + marca(instalado)+" aberto pelo ícone do app"
+    + "</div>";
+
+  if(!https) l += '<div style="margin-top:7px">Abra pelo endereço https, não pelo arquivo.</div>';
+  else if(!android) l += '<div style="margin-top:7px">Só o Android tem essa função. No iPhone, use copiar e colar acima.</div>';
+  else if(!chrome) l += '<div style="margin-top:7px">Abra no Chrome e instale por lá.</div>';
+  else if(!instalado) l += '<div style="margin-top:7px"><b>Falta abrir pelo ícone.</b> Se você abriu pelo navegador, feche e toque no ícone da tela inicial. Se ainda não instalou: menu ⋮ → Instalar aplicativo.</div>';
+  else if(!sw) l += '<div style="margin-top:7px">Recarregue o app uma vez com internet para concluir a instalação.</div>';
+  else l += '<div style="margin-top:7px">Tudo pronto. No WhatsApp: segure a mensagem → <b>Compartilhar</b> → role a lista até <b>Painel GUT</b>.'
+        + '<br><br>Se mesmo assim não aparecer, o Android instalou como atalho e não como app. Solução: segure o ícone → Desinstalar → abra o endereço no Chrome de novo → menu ⋮ → <b>Instalar aplicativo</b> (essa opção precisa aparecer escrita assim; se disser apenas “Adicionar à tela inicial”, aguarde uns minutos e recarregue a página antes de instalar).</div>';
+  return l;
 }
 function analisarTexto(origemRot){
   const txt = document.getElementById("impTexto").value.trim();
@@ -2228,6 +3226,22 @@ function tratarEntradaExterna(){
   const q = new URLSearchParams(location.search);
   const hash = location.hash || "";
 
+  if(hash.startsWith("#ap=")){
+    try{
+      const obj = JSON.parse(b64dec(hash.slice(4)));
+      if(obj.tipo==="aprov-req") abrirAprovacao(obj);
+    }catch(e){ aviso("Link de aprovação inválido."); }
+    history.replaceState(null,"",location.pathname+location.search);
+    return;
+  }
+  if(hash.startsWith("#ar=")){
+    try{
+      const obj = JSON.parse(b64dec(hash.slice(4)));
+      if(obj.tipo==="aprov-resp") registrarResposta(obj);
+    }catch(e){ aviso("Link de resposta inválido."); }
+    history.replaceState(null,"",location.pathname+location.search);
+    return;
+  }
   if(hash.startsWith("#t=")){
     try{
       const obj = JSON.parse(b64dec(hash.slice(3)));
@@ -2255,7 +3269,8 @@ function tratarEntradaExterna(){
   }
   const acao = q.get("acao");
   if(acao==="nova") abrirForm(null);
-  else if(acao==="voz") document.getElementById("btnVoz").click();
+  else if(acao==="carro") abrirModoCarro();
+  else if(acao==="voz") abrirModoCarro();
   else if(acao==="triagem") document.querySelector('.abas button[data-aba="triagem"]').click();
   if(acao) history.replaceState(null,"",location.pathname);
 }
@@ -2420,6 +3435,8 @@ function renderCfg(){
     bp.appendChild(l);
   });
   document.getElementById("cfgAssinatura").value = S.config.assinatura||"";
+  const cmt = document.getElementById("cfgMeuTel");
+  if(cmt) cmt.value = S.config.meuTelefone ? telBonito(S.config.meuTelefone) : "";
   garantirDispositivo();
   const cd = document.getElementById("cfgDispositivo");
   if(cd) cd.value = S.dispositivo.nome||"";
@@ -2457,6 +3474,12 @@ document.getElementById("cfgDispositivo").addEventListener("change", ()=>{
 });
 document.getElementById("cfgAssinatura").addEventListener("change", ()=>{
   S.config.assinatura = document.getElementById("cfgAssinatura").value.trim();
+  salvar();
+});
+document.getElementById("cfgMeuTel").addEventListener("change", ()=>{
+  const v = normalizarTelefone(document.getElementById("cfgMeuTel").value);
+  S.config.meuTelefone = telValido(v) ? v : "";
+  document.getElementById("cfgMeuTel").value = S.config.meuTelefone ? telBonito(v) : "";
   salvar();
 });
 document.getElementById("btnAddCat").onclick = ()=>{
@@ -2563,6 +3586,7 @@ function renderTudo(){
   await carregar();
   await guardarBackup();
   montarDips();
+  montarAtalhosData();
   rascunho = novaTarefa();
   renderTudo();
   marcarSalvo();

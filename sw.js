@@ -3,7 +3,7 @@
    Assim você sempre pega a versão nova quando tem sinal,
    e o app continua abrindo no meio do talhão sem internet. */
 
-const VERSAO = "painel-gut-v1";
+const VERSAO = "painel-gut-v6";
 const ESSENCIAIS = [
   "./",
   "./index.html",
