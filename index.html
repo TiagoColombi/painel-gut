@@ -285,7 +285,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   font-size:clamp(20px,5.6vw,30px);font-weight:600;line-height:1.35;max-width:640px;min-height:2.6em;
 }
 .carro-texto .quando{display:block;font-size:.66em;color:#8FB4C4;font-weight:400;margin-top:8px}
-.carro-acoes{display:flex;gap:12px;width:100%;max-width:520px}
+.carro-acoes{display:flex;flex-wrap:wrap;gap:10px;width:100%;max-width:540px;justify-content:center}
+.carro-acoes .carro-btn{flex:1 1 30%;min-width:130px}
 .carro-btn{
   flex:1;padding:24px 12px;border-radius:8px;border:2px solid #3D4A55;background:#16212A;color:#F2F5F6;
   font-family:var(--cond);font-size:19px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
@@ -495,9 +496,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     <div class="campo">
       <span class="rotulo">Pessoas relacionadas</span>
       <div class="pessoa-linha" style="margin-bottom:8px">
-        <button type="button" id="btnAgenda">📇 Buscar na agenda</button>
-        <button type="button" id="btnNovoContato">+ Novo contato</button>
+        <button type="button" id="btnAgenda">📇 Agenda</button>
+        <button type="button" id="btnVCF">📥 .vcf</button>
+        <button type="button" id="btnNovoContato">+ Contato</button>
       </div>
+      <input type="file" id="arqVCF" accept=".vcf,text/vcard,text/x-vcard" hidden multiple>
       <div class="chips-pessoas" id="chipsPessoas"></div>
       <div class="nota" id="notaAgenda">Toque para marcar quem executa, cobra ou precisa saber. Pode marcar mais de uma pessoa.</div>
     </div>
@@ -586,7 +589,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <div class="chips-pessoas" id="pedirPessoas"></div>
       <div class="pessoa-linha" style="margin-top:8px">
         <button type="button" id="pedirAgenda">📇 Agenda</button>
-        <button type="button" id="pedirNovo">+ Novo contato</button>
+        <button type="button" id="pedirVCF">📥 .vcf</button>
+        <button type="button" id="pedirNovo">+ Contato</button>
       </div>
     </div>
 
@@ -685,10 +689,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     <span class="carro-icone">🎙</span>
   </button>
   <div class="carro-texto" id="carroTexto">Diga a tarefa e quando</div>
-  <div class="carro-acoes" id="carroAcoes" hidden>
-    <button class="carro-btn ok" id="carroSalvar">Salvar</button>
-    <button class="carro-btn" id="carroRepetir">Falar de novo</button>
-  </div>
+  <div class="carro-acoes" id="carroAcoes" hidden></div>
 </div>
 
 <!-- IMPORTAR DE OUTROS APPS -->
@@ -1808,6 +1809,41 @@ function montarAtalhosData(){
 }
 
 /* interpretador pt-BR */
+const NUM_FALADO = {
+  "uma":1,"um":1,"duas":2,"dois":2,"tr[eê]s":3,"quatro":4,"cinco":5,"seis":6,"sete":7,
+  "oito":8,"nove":9,"dez":10,"onze":11,"doze":12,"treze":13,"quatorze":14,"catorze":14,
+  "quinze":15,"dezesseis":16,"dezessete":17,"dezoito":18,"dezenove":19,"vinte":20,
+  "vinte e uma":21,"vinte e um":21,"vinte e duas":22,"vinte e dois":22,"vinte e tr[eê]s":23,"meio dia":12,"meia noite":0
+};
+/* converte "oito da manhã", "duas da tarde", "meio dia" em 08:00 / 14:00 / 12:00 */
+function horaPorExtenso(s){
+  const md = s.match(/\bmeio\s*dia\b/);
+  if(md) return {hora:"12:00", trecho:md[0]};
+  const mn = s.match(/\bmeia\s*noite\b/);
+  if(mn) return {hora:"00:00", trecho:mn[0]};
+  const chaves = Object.keys(NUM_FALADO).filter(k=>!/meio|meia n/.test(k)).sort((a,b)=>b.length-a.length);
+  for(const k of chaves){
+    /* aceita: "oito horas", "oito da manhã", "nove e meia", "às dez e quinze" */
+    const re = new RegExp(
+      "(?:\\b[àa]s\\s+)?\\b"+k+"\\b(\\s+e\\s+(meia|quinze|trinta|quarenta e cinco))?"
+      + "(\\s*(?:horas?|h)\\b)?(?=\\s*(?:da|de|[àa])\\s*(?:manh[ãa]|tarde|noite)|\\s*$|\\s*[,.])", "i");
+    const m = s.match(re);
+    if(!m) continue;
+    /* precisa de algum sinal de que é hora, senão "dois cabos" viraria 02:00 */
+    const temSinal = !!(m[1] || m[3]) || /\s*(?:da|de|[àa])\s*(?:manh[ãa]|tarde|noite)/.test(s.slice(s.indexOf(m[0])+m[0].length))
+                     || /\b[àa]s\s/.test(m[0]);
+    if(!temSinal) continue;
+    let hh = NUM_FALADO[k], mm = 0;
+    const frac = m[2];
+    if(frac==="meia" || frac==="trinta") mm = 30;
+    else if(frac==="quinze") mm = 15;
+    else if(frac) mm = 45;
+    const depois = s.slice(s.indexOf(m[0])+m[0].length);
+    if(/^\s*(?:da|de|[àa])\s*(?:tarde|noite)/.test(depois) && hh < 12) hh += 12;
+    if(hh>=0 && hh<24) return {hora:String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0"), trecho:m[0]};
+  }
+  return null;
+}
 function interpretar(txt){
   const bruto = txt.trim();
   let s = " " + bruto.toLowerCase() + " ";
@@ -1868,6 +1904,14 @@ function interpretar(txt){
     if(hh<24 && mm<60){ r.hora = String(hh).padStart(2,"0")+":"+String(mm).padStart(2,"0"); r._temData=true; }
     cortar(/\b(?:[àa]s?\s*)?\d{1,2}\s*(?:h|:|horas?)\s*(\d{2})?\b/g);
     cortar(/\bda (noite|tarde|manh[aã])(?![A-Za-zÀ-ÿ])/g);
+  } else {
+    const he = horaPorExtenso(s);
+    if(he){
+      r.hora = he.hora; r._temData = true;
+      s = s.replace(he.trecho, " ");
+      cortar(/\b(da|de|[àa])\s*(noite|tarde|manh[aã])(?![A-Za-zÀ-ÿ])/g);
+      cortar(/\b(?:[àa]s?)\s*$/g);
+    }
   }
   // gravidade / urgência
   if(/\burgente\b|\bpra ontem\b|\bagora\b/.test(s)){ r.u=5; r.g=Math.max(r.g,4); cortar(/\burgente\b|\bpra ontem\b/g); }
@@ -1917,7 +1961,7 @@ function pessoasDaTarefa(t){
 }
 function renderChipsPessoas(){
   const box = document.getElementById("chipsPessoas");
-  if(!box) return;
+  if(!box || !rascunho) return;
   box.innerHTML = "";
   if(!S.pessoas.length){
     box.innerHTML = '<div class="vazio-mini">Nenhum contato ainda. Use “Buscar na agenda” ou “+ Novo contato” acima.</div>';
@@ -1991,20 +2035,31 @@ document.getElementById("btnNovoContato").onclick = ()=>abrirContato(null);
 /* agenda do telefone (Contact Picker API)
    ATENÇÃO: select() precisa ser chamado no mesmo "toque" do usuário.
    Qualquer await antes dele descarta a ativação e o Android recusa em silêncio. */
+function agendaDisponivel(){
+  return ("contacts" in navigator) && ("ContactsManager" in window)
+      && navigator.contacts && typeof navigator.contacts.select === "function";
+}
+function porQueSemAgenda(){
+  const ua = navigator.userAgent;
+  if(location.protocol!=="https:") return "o app não está em HTTPS";
+  if(window.self!==window.top) return "a página está dentro de outro app";
+  if(/iPhone|iPad|iPod/i.test(ua)) return "o iPhone não tem essa função";
+  if(!/Android/i.test(ua)) return "só funciona no Android (no computador não existe)";
+  if(/wv\)/.test(ua)) return "o app abriu dentro de um navegador embutido, não no Chrome";
+  if(/SamsungBrowser|EdgA|OPR|FxiOS|Firefox/i.test(ua)) return "só funciona no Chrome";
+  if(!("ContactsManager" in window)) return "seu Chrome está sem essa função (precisa da versão 80 ou mais nova)";
+  return "o Android recusou o acesso";
+}
 function buscarNaAgenda(){
   const nota = document.getElementById("notaAgenda");
-  const temAPI = ("contacts" in navigator) && navigator.contacts && navigator.contacts.select;
-  if(!temAPI){
-    const motivo = (location.protocol!=="https:") ? "o app não está em HTTPS"
-      : (window.self!==window.top) ? "a página está dentro de outro app"
-      : /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "o Safari do iPhone não tem essa função"
-      : !/Chrome/i.test(navigator.userAgent) ? "este navegador não tem essa função — use o Chrome"
-      : "o navegador não liberou o acesso";
-    nota.innerHTML = "Agenda indisponível: "+motivo+". Use “+ Novo contato”.";
-    aviso("Agenda indisponível: "+motivo+".", 5500);
+  if(!agendaDisponivel()){
+    const motivo = porQueSemAgenda();
+    const msg = "Agenda indisponível: "+motivo+".";
+    if(nota) nota.innerHTML = msg + ' <b>Alternativa:</b> importe seus contatos de uma vez pelo arquivo .vcf — botão abaixo.';
+    aviso(msg, 5500);
+    mostrarImportarVCF();
     return;
   }
-  /* chamada síncrona, sem await antes */
   navigator.contacts.select(["name","tel"], {multiple:true})
     .then(sel=>{
       if(!sel || !sel.length) return;
@@ -2029,22 +2084,73 @@ function buscarNaAgenda(){
         });
         novos++;
       });
-      salvar();
-      renderChipsPessoas();
-      renderCfg();
+      salvar(); renderChipsPessoas(); renderCfg();
+      if(typeof renderPedirPessoas==="function") renderPedirPessoas();
       aviso(novos+" contatos importados"+(repetidos?" ("+repetidos+" já existiam)":"")+".", 4000);
     })
     .catch(e=>{
       const nm = (e && e.name) || "erro";
+      if(nm==="AbortError") return;
       const msg = nm==="SecurityError"
-        ? "O Android exigiu que a agenda abrisse direto pelo toque. Toque no botão novamente."
-        : nm==="NotAllowedError" ? "Permissão de contatos negada. Libere nas configurações do Chrome."
-        : nm==="AbortError" ? ""
+        ? "O Android exigiu que a agenda abrisse direto pelo toque. Toque no botão de novo."
+        : nm==="NotAllowedError" ? "Permissão de contatos negada pelo Android."
         : "Não consegui abrir a agenda ("+nm+").";
-      if(msg){ nota.textContent = msg; aviso(msg, 5500); }
+      if(nota) nota.textContent = msg;
+      aviso(msg, 5500);
+      mostrarImportarVCF();
     });
 }
+/* alternativa que funciona em qualquer aparelho: arquivo .vcf da agenda */
+function mostrarImportarVCF(){
+  const inp = document.getElementById("arqVCF");
+  if(!inp) return;
+  aviso("Toque em “Importar .vcf” para trazer seus contatos de uma vez.", 6000);
+}
+function lerVCF(txt){
+  const cartoes = txt.split(/BEGIN:VCARD/i).slice(1);
+  let novos = 0, repetidos = 0, semTel = 0;
+  cartoes.forEach(c=>{
+    const linhas = c.replace(/\r\n[ \t]/g,"").split(/\r?\n/);
+    let nome = "", tel = "", email = "";
+    linhas.forEach(l=>{
+      const i = l.indexOf(":");
+      if(i<0) return;
+      const chave = l.slice(0,i).toUpperCase(), valor = l.slice(i+1).trim();
+      if(/^FN/.test(chave) && !nome) nome = valor.replace(/\\,/g,",");
+      else if(/^N[;:]/.test(chave+":") && !nome){
+        const p = valor.split(";");
+        nome = ((p[1]||"")+" "+(p[0]||"")).trim();
+      }
+      else if(/^TEL/.test(chave) && !tel) tel = valor;
+      else if(/^EMAIL/.test(chave) && !email) email = valor;
+    });
+    if(!nome) return;
+    const t = normalizarTelefone(tel);
+    if(!t){ semTel++; }
+    if(t && S.pessoas.some(p=>p.tel===t)){ repetidos++; return; }
+    S.pessoas.push({
+      id:"p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      nome, tel:t, email, papel:"executa",
+      criadoEm:new Date().toISOString(), atualizadoEm:new Date().toISOString()
+    });
+    novos++;
+  });
+  salvar(); renderChipsPessoas(); renderCfg();
+  if(typeof renderPedirPessoas==="function") renderPedirPessoas();
+  aviso(novos+" contatos importados"
+    + (repetidos?" · "+repetidos+" já existiam":"")
+    + (semTel?" · "+semTel+" sem telefone":"") + ".", 6000);
+}
 document.getElementById("btnAgenda").onclick = buscarNaAgenda;
+document.getElementById("btnVCF").onclick = ()=>document.getElementById("arqVCF").click();
+document.getElementById("arqVCF").onchange = e=>{
+  Array.from(e.target.files||[]).forEach(f=>{
+    const fr = new FileReader();
+    fr.onload = ()=>lerVCF(String(fr.result));
+    fr.readAsText(f);
+  });
+  e.target.value = "";
+};
 
 /* ===== convite: agenda + alarme no aparelho de quem recebe ===== */
 function fusoLocal(){
@@ -2360,6 +2466,7 @@ function renderPedirPessoas(){
 }
 document.getElementById("pedirNovo").onclick = ()=>abrirContato(null);
 document.getElementById("pedirAgenda").onclick = ()=>buscarNaAgenda();
+document.getElementById("pedirVCF").onclick = ()=>document.getElementById("arqVCF").click();
 
 document.getElementById("pedirEnviar").onclick = ()=>{
   const t = pedirTarefa;
@@ -2829,8 +2936,11 @@ function abrirAcoesTarefa(t){
   document.getElementById("folhaAcoes").classList.add("aberta");
 }
 
-/* ============ modo carro ============ */
+/* ============ modo carro: assistente guiado por voz ============ */
 let carroRascunho = null;
+let carroPasso = 0;
+let carroAtivo = false;
+
 function carroDiz(estado, texto, sub){
   document.getElementById("carroEstado").textContent = estado;
   document.getElementById("carroTexto").innerHTML =
@@ -2841,87 +2951,388 @@ function carroAlvoClasse(c){
   a.classList.remove("ouvindo","pensando");
   if(c) a.classList.add(c);
 }
-function abrirModoCarro(){
-  document.getElementById("modoCarro").classList.add("aberta");
-  document.getElementById("carroAcoes").hidden = true;
-  carroRascunho = null;
-  carroDiz("Toque para falar", "Diga a tarefa e quando", "");
-  carroAlvoClasse("");
-  try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
-  /* se o microfone já foi liberado antes, começa sozinho */
-  if(navigator.permissions && navigator.permissions.query){
-    navigator.permissions.query({name:"microphone"})
-      .then(p=>{ if(p.state==="granted") setTimeout(carroEscutar, 500); })
-      .catch(()=>{});
-  }
-}
-function fecharModoCarro(){
-  Voz.parar();
-  try{ speechSynthesis.cancel(); }catch(e){}
-  document.getElementById("modoCarro").classList.remove("aberta");
-  carroRascunho = null;
-}
-function carroEscutar(){
-  document.getElementById("carroAcoes").hidden = true;
-  carroAlvoClasse("ouvindo");
-  carroDiz("Escutando…", "Fale agora", "");
-  Voz.ouvir(texto=>{
-    carroAlvoClasse("pensando");
-    const c = interpretar(texto);
-    carroRascunho = c;
-    const quando = (c.data ? rotuloData(c.data) : "sem data") + (c.hora ? " às "+c.hora : "");
-    carroDiz("Confere?", c.titulo, quando);
-    document.getElementById("carroAcoes").hidden = false;
-    Voz.falar("Anotei: "+c.titulo+", "+quando+". Salvar?", ()=>carroConfirmar());
+function carroBotoes(lista){
+  const box = document.getElementById("carroAcoes");
+  box.innerHTML = "";
+  if(!lista || !lista.length){ box.hidden = true; return; }
+  box.hidden = false;
+  lista.forEach(([rot, fn, forte])=>{
+    const b = document.createElement("button");
+    b.className = "carro-btn" + (forte ? " ok" : "");
+    b.textContent = rot;
+    b.onclick = ()=>{ Voz.parar(); fn(); };
+    box.appendChild(b);
   });
 }
-/* escuta só a confirmação; qualquer coisa fora do esperado mantém os botões na tela */
-function carroConfirmar(){
+function abrirModoCarro(){
+  document.getElementById("modoCarro").classList.add("aberta");
+  carroAtivo = true;
+  carroRascunho = null;
+  carroPasso = 0;
+  carroAlvoClasse("");
+  try{ if(screen.orientation && screen.orientation.lock) screen.orientation.lock("portrait").catch(()=>{}); }catch(e){}
+  if(navigator.permissions && navigator.permissions.query){
+    navigator.permissions.query({name:"microphone"})
+      .then(p=>{ if(p.state==="granted") setTimeout(carroMenu, 500); else carroMenuTela(); })
+      .catch(()=>carroMenuTela());
+  } else carroMenuTela();
+}
+function carroMenuTela(){
+  const n = pendentesTriagem().length + S.tarefas.filter(t=>!t.concluida && t.data===hojeISO()).length;
+  carroDiz("Assistente", "O que vamos fazer?", n ? n+" tarefas esperando" : "Nenhuma tarefa para hoje");
+  carroBotoes([
+    ["➕ Nova tarefa", ()=>carroIniciar(), true],
+    ["🔊 Ouvir as próximas", ()=>carroLer()],
+    ["🎙 Falar", ()=>carroMenuOuvir()]
+  ]);
+}
+function carroMenu(){
+  if(!carroAtivo) return;
+  carroMenuTela();
+  const n = filaParaLer().length;
+  const fala = n
+    ? "Você tem "+n+(n===1?" tarefa":" tarefas")+". Quer criar uma nova ou ouvir as próximas?"
+    : "Quer criar uma tarefa?";
+  Voz.falar(fala, ()=>{ if(carroAtivo) carroMenuOuvir(); });
+}
+function carroMenuOuvir(){
+  if(!carroAtivo) return;
   carroAlvoClasse("ouvindo");
-  Voz.ouvir(resp=>{
-    const r = " "+resp.toLowerCase()+" ";
-    if(/\b(sim|salvar|salva|confirma|confirmar|isso|ok|pode|certo|positivo)\b/.test(r)){ carroSalvar(); return; }
-    if(/\b(n[ãa]o|cancela|cancelar|apaga|errado|de novo|repetir|refazer)\b/.test(r)){
-      Voz.falar("Ok, fale de novo.", ()=>carroEscutar());
+  carroDiz("Escutando…", "Criar tarefa ou ouvir as próximas?", "");
+  Voz.ouvir(bruto=>{
+    if(!carroAtivo) return;
+    const r = " "+bruto.toLowerCase()+" ";
+    if(/\b(sair|cancelar|fechar|nada)(?![A-Za-zÀ-ÿ])/.test(r)){ fecharModoCarro(); return; }
+    if(/\b(ouvir|ler|leia|quais|pr[oó]ximas|minhas tarefas|agenda|o que tenho|pend[eê]ncias|lista)(?![A-Za-zÀ-ÿ])/.test(r)){ carroLer(); return; }
+    if(/\b(criar|nova|novo|anotar|adicionar|incluir|marcar|agendar|tarefa)(?![A-Za-zÀ-ÿ])/.test(r)){ carroIniciar(); return; }
+    /* se falou uma frase inteira, já trata como a própria tarefa */
+    if(bruto.trim().split(/\s+/).length >= 3){
+      carroRascunho = novaTarefa();
+      carroPasso = 1;
+      const p = PASSOS[1];
+      const prox = p.trata(r, bruto);
+      carroAvancar(prox);
       return;
     }
     carroAlvoClasse("");
-    carroDiz("Não entendi", carroRascunho ? carroRascunho.titulo : "", "Toque em Salvar ou Falar de novo");
+    carroDiz("Não entendi", "Criar tarefa ou ouvir as próximas?", "Use os botões abaixo");
   });
 }
-function carroSalvar(){
-  if(!carroRascunho){ carroEscutar(); return; }
+
+/* ---- leitura das tarefas em voz alta ---- */
+let lendoFila = [], lendoIdx = 0;
+function filaParaLer(){
+  const hoje = hojeISO();
+  return ordenar(S.tarefas.filter(t=>!t.concluida && t.data && t.data <= somaDias(hoje,1)));
+}
+function carroLer(){
+  lendoFila = filaParaLer();
+  lendoIdx = 0;
+  if(!lendoFila.length){
+    carroDiz("Tudo em dia", "Nenhuma tarefa para hoje", "");
+    carroBotoes([["➕ Nova tarefa", ()=>carroIniciar(), true], ["✓ Sair", ()=>fecharModoCarro()]]);
+    Voz.falar("Você não tem tarefas para hoje.", ()=>{});
+    return;
+  }
+  const n = lendoFila.length;
+  const atrasadas = lendoFila.filter(t=>diasAtraso(t)>0).length;
+  Voz.falar(n+(n===1?" tarefa":" tarefas")+(atrasadas?", sendo "+atrasadas+" em atraso":"")+".", ()=>lerItem());
+}
+function lerItem(){
+  if(!carroAtivo) return;
+  if(lendoIdx >= lendoFila.length){
+    carroDiz("Fim da lista", "Acabaram as tarefas", "");
+    carroBotoes([["➕ Nova tarefa", ()=>carroIniciar(), true], ["↺ Ouvir de novo", ()=>carroLer()], ["✓ Sair", ()=>fecharModoCarro()]]);
+    Voz.falar("Acabou a lista.", ()=>{});
+    return;
+  }
+  const t = lendoFila[lendoIdx];
+  const atr = diasAtraso(t);
+  const quando = t.data ? rotuloExtenso(t.data)+(t.hora?" às "+t.hora:"") : "sem data";
+  const prio = faixa(pontuacao(t));
+  carroAlvoClasse("");
+  carroDiz((lendoIdx+1)+" de "+lendoFila.length, t.titulo,
+    quando + (atr>0 ? " · "+atr+" d de atraso" : "") + " · " + catDe(t.categoria).nome);
+  carroBotoes([
+    ["✓ Feita", ()=>{ concluirLida(t); }, true],
+    ["→ Próxima", ()=>{ lendoIdx++; lerItem(); }],
+    ["📅 Amanhã", ()=>{ adiarLida(t); }]
+  ]);
+  const fala = (lendoIdx+1)+". "+t.titulo+". "+quando
+    + (atr>0 ? ", atrasada "+atr+(atr===1?" dia":" dias") : "")
+    + (prio==="alta" ? ", prioridade alta" : "")
+    + ". Feita, adiar ou próxima?";
+  Voz.falar(fala, ()=>{ if(carroAtivo) ouvirComandoLeitura(); });
+}
+function ouvirComandoLeitura(){
+  carroAlvoClasse("ouvindo");
+  Voz.ouvir(bruto=>{
+    if(!carroAtivo) return;
+    const r = " "+bruto.toLowerCase()+" ";
+    const t = lendoFila[lendoIdx];
+    if(/\b(feita|feito|conclu[ií]|conclu[ií]da|pronto|resolvido|j[aá] fiz|fiz|ok|check)(?![A-Za-zÀ-ÿ])/.test(r)){ concluirLida(t); return; }
+    if(/\b(adiar|adia|amanh[ãa]|depois|empurra|empurrar|remarcar)(?![A-Za-zÀ-ÿ])/.test(r)){ adiarLida(t); return; }
+    if(/\b(pr[oó]xima|pr[oó]ximo|pula|pular|seguinte|passa|passar)(?![A-Za-zÀ-ÿ])/.test(r)){ lendoIdx++; lerItem(); return; }
+    if(/\b(repetir|repete|de novo)(?![A-Za-zÀ-ÿ])/.test(r)){ lerItem(); return; }
+    if(/\b(parar|sair|chega|fechar|cancelar|menu|voltar)(?![A-Za-zÀ-ÿ])/.test(r)){ carroMenu(); return; }
+    if(/\b(avisar|mandar|whats)\b/.test(r)){
+      fecharModoCarro();
+      abrirMensagem(t, diasAtraso(t)>0 ? "cobrar" : "aviso");
+      return;
+    }
+    carroAlvoClasse("");
+    carroDiz("Não entendi", t.titulo, "Diga: feita, adiar ou próxima");
+  });
+}
+function concluirLida(t){
+  Voz.parar();
+  if(t.repete && t.repete.freq!=="none"){
+    const prox = proximaOcorrencia(t, t.data || hojeISO());
+    if(prox){ t.data = prox; t.pulos = 0; }
+  } else {
+    t.concluida = true;
+    t.concluidaEm = new Date().toISOString();
+  }
+  tocar(t); gravarAgora(); renderTudo();
+  bip();
+  lendoIdx++;
+  Voz.falar("Feita.", ()=>lerItem());
+}
+function adiarLida(t){
+  Voz.parar();
+  t.data = somaDias(hojeISO(), 1);
+  tocar(t); gravarAgora(); renderTudo();
+  lendoIdx++;
+  Voz.falar("Passei para amanhã.", ()=>lerItem());
+}
+function fecharModoCarro(){
+  carroAtivo = false;
+  Voz.parar();
+  try{ speechSynthesis.cancel(); }catch(e){}
+  document.getElementById("modoCarro").classList.remove("aberta");
+  carroRascunho = null; carroPasso = 0; lendoFila = []; lendoIdx = 0;
+}
+function carroIniciar(){
+  lendoFila = []; lendoIdx = 0;
+  carroRascunho = novaTarefa();
+  carroPasso = 1;
+  carroPerguntar();
+}
+/* comandos que valem em qualquer etapa */
+function comandoGeral(r){
+  if(/\b(cancelar|sair|parar|esquece)(?![A-Za-zÀ-ÿ])/.test(r)){ fecharModoCarro(); return "saiu"; }
+  if(/\b(voltar|anterior)(?![A-Za-zÀ-ÿ])/.test(r)){ carroPasso = Math.max(1, carroPasso-1); carroPerguntar(); return "voltou"; }
+  if(/\b(pular|pula|nenhum|nenhuma|n[ãa]o sei|deixa|tanto faz|depois)(?![A-Za-zÀ-ÿ])/.test(r)) return "pular";
+  if(/\b(repetir|de novo|repete)(?![A-Za-zÀ-ÿ])/.test(r)){ carroPerguntar(); return "repetiu"; }
+  return "";
+}
+const PASSOS = [
+  null,
+  { /* 1 — o que é */
+    fala:"Qual é a tarefa?",
+    tela:["Passo 1 de 6","Qual é a tarefa?","Diga o que precisa ser feito"],
+    botoes:()=>[["🎙 Falar", ()=>carroOuvirPasso()]],
+    trata:(r, bruto)=>{
+      const c = interpretar(bruto);
+      carroRascunho.titulo = c.titulo;
+      if(c._temData){ carroRascunho.data = c.data; carroRascunho.hora = c.hora; }
+      carroRascunho.g = c.g; carroRascunho.u = c.u; carroRascunho.t = c.t;
+      if(c.pessoaIds && c.pessoaIds.length) carroRascunho.pessoaIds = c.pessoaIds;
+      if(c.repete) carroRascunho.repete = c.repete;
+      return c._temData ? 3 : 2;   /* se já falou a data, pula o passo 2 */
+    }
+  },
+  { /* 2 — quando */
+    fala:"Para quando?",
+    tela:["Passo 2 de 6","Para quando?","Hoje, amanhã, sexta, dia 15…"],
+    botoes:()=>[
+      ["Hoje", ()=>{ carroRascunho.data=hojeISO(); carroAvancar(3); }],
+      ["Amanhã", ()=>{ carroRascunho.data=somaDias(hojeISO(),1); carroAvancar(3); }],
+      ["🎙 Falar", ()=>carroOuvirPasso()]
+    ],
+    trata:(r, bruto)=>{
+      const c = interpretar(bruto);
+      carroRascunho.data = c.data || hojeISO();
+      if(c.hora) carroRascunho.hora = c.hora;
+      return 3;
+    }
+  },
+  { /* 3 — hora */
+    fala:"Que horas? Pode dizer pular se não tiver hora marcada.",
+    tela:["Passo 3 de 6","Que horas?","Ou diga “pular”"],
+    botoes:()=>[
+      ["Sem hora", ()=>{ carroRascunho.hora=""; carroAvancar(4); }],
+      ["🎙 Falar", ()=>carroOuvirPasso()]
+    ],
+    trata:(r, bruto)=>{
+      const c = interpretar(bruto);
+      if(c.hora) carroRascunho.hora = c.hora;
+      return 4;
+    },
+    aoPular:()=>{ carroRascunho.hora=""; return 4; }
+  },
+  { /* 4 — frente */
+    fala:()=>"Qual frente? "+S.categorias.map(c=>c.nome).join(", ")+". Ou diga pular.",
+    tela:()=>["Passo 4 de 6","Qual frente?", S.categorias.map(c=>c.nome).join(" · ")],
+    botoes:()=>S.categorias.slice(0,3).map(c=>[c.nome, ()=>{ carroRascunho.categoria=c.id; carroAvancar(5); }])
+              .concat([["🎙 Falar", ()=>carroOuvirPasso()]]),
+    trata:(r, bruto)=>{
+      const achou = S.categorias.find(c=>r.includes(c.nome.toLowerCase().split(".")[0]));
+      if(achou) carroRascunho.categoria = achou.id;
+      return 5;
+    },
+    aoPular:()=>5
+  },
+  { /* 5 — prioridade */
+    fala:"Qual a importância? Diga alta, média ou baixa.",
+    tela:["Passo 5 de 6","Qual a importância?","Alta, média ou baixa"],
+    botoes:()=>[
+      ["Alta", ()=>{ carroPrio(5,5,4); carroAvancar(6); }, true],
+      ["Média", ()=>{ carroPrio(3,3,3); carroAvancar(6); }],
+      ["Baixa", ()=>{ carroPrio(2,1,1); carroAvancar(6); }]
+    ],
+    trata:(r, bruto)=>{
+      if(/\b(alta|urgente|grave|cr[ií]tic|m[aá]xim)/.test(r)) carroPrio(5,5,4);
+      else if(/\b(baixa|tranquil|sem pressa|pouco)/.test(r)) carroPrio(2,1,1);
+      else carroPrio(3,3,3);
+      return 6;
+    },
+    aoPular:()=>{ carroPrio(3,3,3); return 6; }
+  },
+  { /* 6 — avisar alguém */
+    fala:"Quer avisar alguém? Diga o nome, ou diga não.",
+    tela:["Passo 6 de 6","Avisar alguém?","Diga o nome ou “não”"],
+    botoes:()=>{
+      const b = S.pessoas.slice(0,2).map(p=>[primeiroNome(p), ()=>{ carroRascunho.pessoaIds=[p.id]; carroAvancar(7); }]);
+      b.push(["Ninguém", ()=>{ carroRascunho.pessoaIds=[]; carroAvancar(7); }]);
+      return b;
+    },
+    trata:(r, bruto)=>{
+      if(/\b(n[ãa]o|ningu[eé]m|sozinho)(?![A-Za-zÀ-ÿ])/.test(r)){ carroRascunho.pessoaIds=[]; return 7; }
+      const achou = S.pessoas.find(p=>{
+        const pn = primeiroNome(p).toLowerCase();
+        return pn.length>2 && r.includes(pn);
+      });
+      if(achou) carroRascunho.pessoaIds = [achou.id];
+      return 7;
+    },
+    aoPular:()=>{ carroRascunho.pessoaIds=[]; return 7; }
+  }
+];
+function carroPrio(g,u,t){ carroRascunho.g=g; carroRascunho.u=u; carroRascunho.t=t; }
+
+function carroPerguntar(){
+  if(!carroAtivo) return;
+  if(carroPasso >= 7){ carroResumo(); return; }
+  const p = PASSOS[carroPasso];
+  if(!p){ carroResumo(); return; }
+  const tela = typeof p.tela==="function" ? p.tela() : p.tela;
+  carroAlvoClasse("");
+  carroDiz(tela[0], tela[1], tela[2]);
+  carroBotoes(p.botoes());
+  const fala = typeof p.fala==="function" ? p.fala() : p.fala;
+  Voz.falar(fala, ()=>{ if(carroAtivo) carroOuvirPasso(); });
+}
+function carroOuvirPasso(){
+  if(!carroAtivo) return;
+  carroAlvoClasse("ouvindo");
+  const p = PASSOS[carroPasso];
+  const tela = typeof p.tela==="function" ? p.tela() : p.tela;
+  carroDiz("Escutando…", tela[1], "Fale agora");
+  Voz.ouvir(bruto=>{
+    if(!carroAtivo) return;
+    const r = " "+bruto.toLowerCase()+" ";
+    const cmd = comandoGeral(r);
+    if(cmd==="saiu" || cmd==="voltou" || cmd==="repetiu") return;
+    carroAlvoClasse("pensando");
+    let prox;
+    if(cmd==="pular" && p.aoPular) prox = p.aoPular();
+    else prox = p.trata(r, bruto);
+    carroAvancar(prox);
+  });
+}
+function carroAvancar(passo){
+  carroPasso = passo;
+  setTimeout(carroPerguntar, 220);
+}
+function carroResumo(){
   const c = carroRascunho;
-  const t = novaTarefa();
-  t.titulo = c.titulo;
-  t.data = c.data || hojeISO();
-  t.hora = c.hora || "";
-  t.g = c.g||3; t.u = c.u||3; t.t = c.t||3;
-  t.categoria = c.categoria || S.categorias[0].id;
-  t.pessoaIds = c.pessoaIds || [];
-  t.repete = c.repete || t.repete;
+  const p = pontuacao(c);
+  const quando = (c.data ? rotuloExtenso(c.data) : "sem data") + (c.hora ? " às "+c.hora : "");
+  const pes = (c.pessoaIds||[]).map(pessoaDe).filter(Boolean);
+  const detalhe = quando + " · " + catDe(c.categoria).nome + " · prioridade " + p
+    + (pes.length ? " · avisar "+pes.map(primeiroNome).join(", ") : "");
+  carroAlvoClasse("");
+  carroDiz("Confere?", c.titulo, detalhe);
+  carroBotoes([
+    ["💾 Salvar", ()=>carroSalvar(false), true],
+    ["📲 Salvar e avisar", ()=>carroSalvar(true)],
+    ["↺ Refazer", ()=>carroIniciar()]
+  ]);
+  const fala = "Confere: "+c.titulo+", "+quando+", prioridade "+(faixa(p)==="alta"?"alta":faixa(p)==="media"?"média":"baixa")
+    + (pes.length ? ", avisando "+pes.map(primeiroNome).join(" e ") : "")
+    + ". Salvar?";
+  Voz.falar(fala, ()=>{ if(carroAtivo) carroConfirmar(); });
+}
+function carroConfirmar(){
+  carroAlvoClasse("ouvindo");
+  Voz.ouvir(resp=>{
+    if(!carroAtivo) return;
+    const r = " "+resp.toLowerCase()+" ";
+    if(/\b(salvar e avisar|avisar|compartilhar|manda|mandar)(?![A-Za-zÀ-ÿ])/.test(r)){ carroSalvar(true); return; }
+    if(/\b(sim|salvar|salva|confirma|confirmar|isso|ok|pode|certo|positivo)(?![A-Za-zÀ-ÿ])/.test(r)){ carroSalvar(false); return; }
+    if(/\b(n[ãa]o|refazer|de novo|errado|cancela|corrigir)(?![A-Za-zÀ-ÿ])/.test(r)){
+      Voz.falar("Vamos de novo.", ()=>carroIniciar());
+      return;
+    }
+    carroAlvoClasse("");
+    carroDiz("Não entendi", carroRascunho ? carroRascunho.titulo : "", "Use os botões abaixo");
+  });
+}
+function carroSalvar(avisar){
+  if(!carroRascunho) return;
+  const t = carroRascunho;
+  if(!t.titulo){ carroIniciar(); return; }
+  if(!t.data) t.data = hojeISO();
   t.origem = "modo carro";
+  tocar(t);
   S.tarefas.push(t);
   gravarAgora(); renderTudo();
-  carroAlvoClasse("");
-  document.getElementById("carroAcoes").hidden = true;
-  const quando = rotuloData(t.data)+(t.hora?" às "+t.hora:"");
-  carroDiz("Salvo ✓", t.titulo, quando+" · prioridade "+pontuacao(t));
   bip();
-  Voz.falar("Salvo.", ()=>{
-    setTimeout(()=>{
-      if(!document.getElementById("modoCarro").classList.contains("aberta")) return;
-      carroDiz("Toque para falar", "Diga a próxima tarefa", "");
-    }, 1400);
+  carroAlvoClasse("");
+  const quando = rotuloExtenso(t.data)+(t.hora?" às "+t.hora:"");
+  carroDiz("Salvo ✓", t.titulo, quando+" · prioridade "+pontuacao(t));
+  const pes = (t.pessoaIds||[]).map(pessoaDe).filter(Boolean);
+  if(avisar && pes.length){
+    Voz.falar("Salvo. Abrindo o WhatsApp.", ()=>{
+      fecharModoCarro();
+      abrirMensagem(t, "aviso");
+    });
+    return;
+  }
+  carroBotoes([
+    ["➕ Nova tarefa", ()=>carroIniciar(), true],
+    ["🔊 Ouvir as próximas", ()=>carroLer()],
+    ["✓ Terminei", ()=>fecharModoCarro()]
+  ]);
+  Voz.falar("Salvo. Quer criar outra?", ()=>{
+    if(!carroAtivo) return;
+    carroAlvoClasse("ouvindo");
+    Voz.ouvir(r=>{
+      if(!carroAtivo) return;
+      if(/\b(sim|outra|nova|mais|pode)(?![A-Za-zÀ-ÿ])/.test(" "+r.toLowerCase()+" ")) carroIniciar();
+      else if(/\b(n[ãa]o|terminei|acabou|fechar|sair|s[oó] isso)(?![A-Za-zÀ-ÿ])/.test(" "+r.toLowerCase()+" ")) fecharModoCarro();
+      else carroAlvoClasse("");
+    });
   });
   carroRascunho = null;
 }
 document.getElementById("carroAlvo").onclick = ()=>{
-  if(Voz.ocupado){ Voz.parar(); carroAlvoClasse(""); carroDiz("Pausado","Toque para falar",""); return; }
-  carroEscutar();
+  if(Voz.ocupado){ Voz.parar(); carroAlvoClasse(""); return; }
+  if(lendoFila.length && lendoIdx < lendoFila.length) ouvirComandoLeitura();
+  else if(!carroPasso) carroMenuOuvir();
+  else carroOuvirPasso();
 };
-document.getElementById("carroSalvar").onclick = carroSalvar;
-document.getElementById("carroRepetir").onclick = ()=>{ Voz.parar(); carroEscutar(); };
 document.getElementById("carroSair").onclick = fecharModoCarro;
 
 /* ============ trazer de outros apps ============ */
@@ -3270,6 +3681,7 @@ function tratarEntradaExterna(){
   const acao = q.get("acao");
   if(acao==="nova") abrirForm(null);
   else if(acao==="carro") abrirModoCarro();
+  else if(acao==="ler"){ abrirModoCarro(); setTimeout(carroLer, 700); }
   else if(acao==="voz") abrirModoCarro();
   else if(acao==="triagem") document.querySelector('.abas button[data-aba="triagem"]').click();
   if(acao) history.replaceState(null,"",location.pathname);
