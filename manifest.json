@@ -1,7 +1,7 @@
 {
   "id": "/painel-gut/",
-  "name": "Painel de Tarefas GUT",
-  "short_name": "Painel GUT",
+  "name": "Agenda Tarefas",
+  "short_name": "Agenda Tarefas",
   "description": "Tarefas por gravidade, urgência e tendência, com atraso acumulado",
   "lang": "pt-BR",
   "dir": "ltr",
@@ -40,12 +40,31 @@
     }
   ],
   "share_target": {
-    "action": "./index.html",
-    "method": "GET",
+    "action": "./share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
     "params": {
       "title": "title",
       "text": "text",
-      "url": "url"
+      "url": "url",
+      "files": [
+        {
+          "name": "arquivos",
+          "accept": [
+            "text/vcard",
+            "text/x-vcard",
+            "text/directory",
+            ".vcf",
+            "text/calendar",
+            ".ics",
+            "application/json",
+            ".json",
+            "text/plain",
+            ".txt",
+            ".eml"
+          ]
+        }
+      ]
     }
   },
   "shortcuts": [
