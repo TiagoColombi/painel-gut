@@ -334,6 +334,36 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .chips-pessoas .sel-pessoa[aria-pressed="true"] .ini{background:#fff;color:var(--tinta)}
 .chips-pessoas .vazio-mini{font-size:12.5px;color:var(--tinta-3);padding:6px 0}
 
+
+/* seletor compacto de pessoas */
+.mini-ic{
+  border:1px solid var(--linha-forte);background:var(--painel);border-radius:999px;
+  padding:2px 9px;font-size:12px;margin-left:6px;letter-spacing:0;text-transform:none;
+  font-family:var(--texto);color:var(--aco);
+}
+.pop{position:fixed;inset:0;z-index:95;background:rgba(18,24,29,.4);display:none;align-items:flex-end;justify-content:center}
+.pop.aberta{display:flex}
+.pop-corpo{
+  background:var(--painel);width:100%;max-width:460px;border-radius:10px 10px 0 0;
+  padding:10px 12px calc(env(safe-area-inset-bottom) + 12px);max-height:62vh;display:flex;flex-direction:column;
+}
+.pop-topo{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.pop-topo input{flex:1}
+.pop-lista{overflow:auto;flex:1;min-height:80px;margin-bottom:8px}
+.pop-item{
+  display:flex;align-items:center;gap:10px;padding:11px 6px;border-bottom:1px solid var(--linha);
+  width:100%;text-align:left;font-size:15px;
+}
+.pop-item .ini{width:28px;height:28px;border-radius:50%;background:var(--aco);color:#fff;
+  font-family:var(--mono);font-size:11px;display:grid;place-items:center;flex:none}
+.pop-item[aria-pressed="true"]{background:#EAF3F6}
+.pop-item[aria-pressed="true"] .marca{color:var(--baixa);font-weight:700}
+.pop-item .marca{margin-left:auto;color:var(--linha-forte);font-size:18px}
+.pop-item .tel{font-family:var(--mono);font-size:11px;color:var(--tinta-3);display:block}
+.pop-rodape{display:flex;gap:8px}
+.pop-rodape .btn{flex:1}
+.pop-vazio{padding:22px 8px;text-align:center;color:var(--tinta-3);font-size:13.5px}
+
 /* pessoas e mensagens */
 .pessoa-chip{
   display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
@@ -470,8 +500,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 <div class="barra-baixo">
   <button class="fab" id="btnNova">Nova tarefa</button>
   <button class="mic" id="btnImp" aria-label="Trazer de outro app" title="Trazer de outro app" style="border-color:var(--linha-forte)">⤵</button>
-  <button class="mic" id="btnVoz" aria-label="Ditar tarefa" title="Ditar tarefa">🎙</button>
-  <button class="mic" id="btnEscuta" aria-label="Escuta contínua" title="Escuta contínua" aria-pressed="false">👂</button>
+  <button class="mic" id="btnEscuta" aria-label="Assistente de voz" title="Toque: escuta · Segure: assistente" aria-pressed="false">👂</button>
 </div>
 
 <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
@@ -497,14 +526,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
     <label class="campo"><span>Frente</span><select id="fCategoria"></select></label>
 
     <div class="campo">
-      <span class="rotulo">Pessoas relacionadas</span>
-      <div class="pessoa-linha" style="margin-bottom:8px">
-        <button type="button" id="btnAgenda">👥 Adicionar contatos</button>
-        <button type="button" id="btnNovoContato">+ Um contato</button>
-      </div>
-      <input type="file" id="arqVCF" hidden multiple>
+      <span class="rotulo">Pessoas <button type="button" class="mini-ic" id="btnAbrirPessoas" aria-label="Escolher pessoas">👤+</button></span>
       <div class="chips-pessoas" id="chipsPessoas"></div>
-      <div class="nota" id="notaAgenda">Toque para marcar quem executa, cobra ou precisa saber. Pode marcar mais de uma pessoa.</div>
+      <div class="nota" id="notaAgenda">Os contatos aparecem aqui conforme você compartilha tarefas no WhatsApp.</div>
     </div>
 
     <label class="campo"><span>Gravidade — impacto se nada for feito</span>
@@ -590,8 +614,8 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
       <span class="rotulo">Quem precisa aprovar</span>
       <div class="chips-pessoas" id="pedirPessoas"></div>
       <div class="pessoa-linha" style="margin-top:8px">
-        <button type="button" id="pedirAgenda">👥 Adicionar contatos</button>
-        <button type="button" id="pedirNovo">+ Um contato</button>
+        <button type="button" id="pedirAgenda">👤+ Escolher pessoas</button>
+        <button type="button" id="pedirNovo">+ Criar contato</button>
       </div>
     </div>
 
@@ -732,40 +756,77 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   </div>
 </div>
 
+<!-- SELETOR COMPACTO DE PESSOAS -->
+<div class="pop" id="popPessoas" role="dialog" aria-modal="true" aria-label="Escolher pessoas">
+  <div class="pop-corpo">
+    <div class="pop-topo">
+      <input type="text" id="buscaPessoa" placeholder="Buscar ou digitar novo nome" autocomplete="off">
+      <button class="fechar" data-fecha aria-label="Fechar">×</button>
+    </div>
+    <div class="pop-lista" id="listaPop"></div>
+    <div class="pop-rodape">
+      <button class="btn btn-vazio" id="popNovo">+ Criar contato</button>
+      <button class="btn btn-cheio" data-fecha>Pronto</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARTILHAR TAREFA -->
+<div class="folha" id="folhaEnviar" role="dialog" aria-modal="true" aria-label="Compartilhar tarefa">
+  <div class="folha-corpo">
+    <div class="folha-topo">
+      <h2>Compartilhar no WhatsApp</h2>
+      <button class="fechar" data-fecha aria-label="Fechar">×</button>
+    </div>
+    <div class="previa" id="enviarPrevia" style="margin-bottom:14px"></div>
+
+    <div class="rotulo">O que a pessoa vai poder fazer</div>
+    <div class="menu-acoes" style="margin-bottom:14px">
+      <button id="modoSoAvisar"><span class="ic">📲</span><span>Só avisar<span class="sub">Ela recebe o texto da tarefa</span></span></button>
+      <button id="modoConvite"><span class="ic">📅</span><span>Avisar e mandar convite<span class="sub">Ela salva na agenda dela com alarme</span></span></button>
+      <button id="modoAprovacao"><span class="ic">🖐️</span><span>Pedir aprovação<span class="sub">Ela aprova, recusa ou sugere outra data</span></span></button>
+    </div>
+
+    <div class="rotulo">Quem vai receber</div>
+    <label class="campo"><span>Nome (fica salvo para as próximas tarefas)</span>
+      <input type="text" id="enviarNome" placeholder="Ex.: Marcos Ferreira" autocomplete="off">
+    </label>
+    <div class="chips-pessoas" id="enviarConhecidos" style="margin-bottom:12px"></div>
+    <div class="nota" style="margin-bottom:12px">Você escolhe o contato dentro do WhatsApp. O nome aqui serve só para o app lembrar quem foi.</div>
+
+    <div class="acoes">
+      <button class="btn btn-vazio" data-fecha>Cancelar</button>
+      <button class="btn btn-cheio" id="enviarAgora">Abrir WhatsApp</button>
+    </div>
+  </div>
+</div>
+
 <!-- IMPORTAR CONTATOS -->
-<div class="folha" id="folhaContatos" role="dialog" aria-modal="true" aria-label="Importar contatos">
+<div class="folha" id="folhaContatos" role="dialog" aria-modal="true" aria-label="Adicionar contatos">
   <div class="folha-corpo">
     <div class="folha-topo">
       <h2>Adicionar contatos</h2>
       <button class="fechar" data-fecha aria-label="Fechar">×</button>
     </div>
+    <div class="nota" style="margin-bottom:12px">Os contatos também nascem sozinhos: ao compartilhar uma tarefa no WhatsApp, o nome que você digitar fica salvo aqui.</div>
 
-    <button class="btn btn-cheio" id="viaAgendaTopo" style="width:100%;padding:16px;margin-bottom:6px">📇 Escolher na agenda do telefone</button>
-    <div class="nota" id="avisoAgendaTopo" style="margin-bottom:16px">Abre seus contatos do Android. Marque quem quiser e pronto.</div>
-
-    <div class="rotulo">Se a agenda não abrir</div>
     <label class="campo"><span>Cole ou digite: um por linha, nome e telefone</span>
-      <textarea id="listaContatos" rows="5" placeholder="Marcos Ferreira 27 99999-8888&#10;Ana Paula 27988887777"></textarea>
+      <textarea id="listaContatos" rows="7" placeholder="Marcos Ferreira 27 99999-8888&#10;Ana Paula 27988887777&#10;João da Silva, (27) 3722-1234&#10;Pedro (só o nome já serve)"></textarea>
     </label>
-    <div class="acoes" style="margin-bottom:6px">
+    <div class="acoes" style="margin-bottom:8px">
       <button class="btn btn-vazio" id="colarLista">Colar</button>
       <button class="btn btn-cheio" id="lerLista">Adicionar</button>
     </div>
-    <div class="nota" style="margin-bottom:16px">Aceita qualquer separador — espaço, vírgula ou traço.</div>
+    <div class="nota">Aceita espaço, vírgula ou traço como separador. O telefone é opcional.</div>
 
     <div class="linha-cfg">
-      <div class="rotulo">Outros jeitos</div>
-      <div class="menu-acoes">
-        <button id="viaAgenda"><span class="ic">📇</span><span>Agenda do telefone<span class="sub" id="subAgenda">Abre a lista de contatos do Android</span></span></button>
-        <button id="viaCompartilhar"><span class="ic">📤</span><span>Pelo app Contatos do celular<span class="sub">Abra Contatos → selecione → Compartilhar → Agenda Tarefas</span></span></button>
-        <button id="viaArquivo"><span class="ic">📁</span><span>Arquivo .vcf<span class="sub">No seletor que abrir, escolha <b>Arquivos</b> e ache o .vcf</span></span></button>
-        <button id="viaManual"><span class="ic">✏️</span><span>Digitar um contato<span class="sub">Nome, telefone, e-mail e papel</span></span></button>
-        <button id="viaDiagnostico"><span class="ic">🔎</span><span>Diagnóstico da agenda<span class="sub">Mostra o motivo técnico se não estiver funcionando</span></span></button>
+      <div class="acoes">
+        <button class="btn btn-vazio" id="viaManual">✏️ Criar um contato</button>
+        <button class="btn btn-vazio" id="viaArquivo">📁 Arquivo .vcf</button>
       </div>
-      <div class="nota" style="margin-top:10px">Para gerar o .vcf: abra <b>Contatos</b> no celular → menu → <b>Exportar</b> ou <b>Compartilhar</b> → salvar arquivo.</div>
+      <input type="file" id="arqVCF2" hidden multiple>
+      <div class="nota" style="margin-top:7px">No app Contatos do celular: selecione os contatos → Compartilhar → escolha <b>Arquivos</b> para salvar o .vcf, ou compartilhe direto para o Agenda Tarefas.</div>
     </div>
-
-    <div id="painelDiag" hidden style="margin-top:14px"></div>
   </div>
 </div>
 
@@ -1308,7 +1369,7 @@ function cartao(t){
     bt.textContent = pes
       ? (cobrando ? "Cobrar" : "Avisar") + " " + primeiroNome(pes) + (pessoas.length>1 ? " +"+(pessoas.length-1) : "")
       : "Enviar aviso";
-    bt.onclick = e => { e.stopPropagation(); abrirMensagem(t, cobrando ? "cobrar" : "aviso"); };
+    bt.onclick = e => { e.stopPropagation(); abrirEnviar(t, cobrando ? "avisar" : "avisar"); };
     linhaAcao.appendChild(bt);
     meio.appendChild(linhaAcao);
   }
@@ -1626,10 +1687,9 @@ function abrirForm(t){
   rascunho.pessoaIds = pessoasDaTarefa(rascunho);
   renderChipsPessoas();
   const na = document.getElementById("notaAgenda");
-  const temAgenda = ("contacts" in navigator) && navigator.contacts && navigator.contacts.select;
-  na.innerHTML = temAgenda
-    ? "Toque para marcar quem executa, cobra ou precisa saber. Pode marcar mais de uma pessoa."
-    : "Toque para marcar quem executa ou cobra — pode ser mais de uma pessoa. <b>A agenda do telefone está indisponível aqui</b> (só abre no Chrome do Android, com o app em HTTPS e instalado na tela inicial). Use “+ Novo contato”.";
+  na.textContent = S.pessoas.length
+    ? "Toque em 👤+ para escolher quem executa, cobra ou precisa saber."
+    : "Nenhum contato ainda. Eles são salvos ao compartilhar uma tarefa no WhatsApp.";
   document.getElementById("fTitulo").value = rascunho.titulo;
   document.getElementById("fData").value = rascunho.data||"";
   document.getElementById("fHora").value = rascunho.hora||"";
@@ -1733,13 +1793,14 @@ function ditarPeloTeclado(){
    Agora a escuta fica viva e só roteamos o que chega. */
 const Voz = {
   rec:null, ligada:false, falando:false, alvo:null, ocupado:false,
-  reiniciando:false, falhas:0,
+  reiniciando:false, falhas:0, ultimaFala:"",
   suportado(){ return "webkitSpeechRecognition" in window || "SpeechRecognition" in window; },
   marcarUI(on){
-    const bt = document.getElementById("btnVoz");
-    if(bt) bt.classList.toggle("ouvindo", !!on);
     const t = document.getElementById("btnEscuta");
-    if(t) t.setAttribute("aria-pressed", this.ligada ? "true" : "false");
+    if(t){
+      t.setAttribute("aria-pressed", this.ligada ? "true" : "false");
+      t.classList.toggle("ouvindo", !!(on && this.ocupado));
+    }
   },
   iniciar(){
     const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1798,9 +1859,17 @@ const Voz = {
   falar(txt, aoTerminar){
     let feito = false;
     this.falando = true;
+    this.ultimaFala = (txt||"").toLowerCase();
+    /* silencia o microfone enquanto fala: senão ele transcreve a própria pergunta */
+    const estavaLigada = this.ligada;
+    if(this.rec){ try{ this.rec.onend = null; this.rec.abort(); }catch(e){} this.rec = null; }
     const fim = ()=>{
       if(feito) return; feito = true;
-      setTimeout(()=>{ this.falando = false; if(aoTerminar) aoTerminar(); }, 260);
+      setTimeout(()=>{
+        this.falando = false;
+        if(estavaLigada){ this.ligada = true; this.iniciar(); }
+        if(aoTerminar) aoTerminar();
+      }, 420);
     };
     try{
       speechSynthesis.cancel();
@@ -1808,12 +1877,25 @@ const Voz = {
       u.lang = "pt-BR"; u.rate = 1.05;
       u.onend = fim; u.onerror = fim;
       speechSynthesis.speak(u);
-      setTimeout(fim, 1000 + txt.length * 95);
+      setTimeout(fim, 1200 + txt.length * 95);
     }catch(e){ setTimeout(fim, 500); }
+  },
+  /* descarta transcrições que são eco da própria fala do app */
+  ecoDaFala(txt){
+    if(!this.ultimaFala) return false;
+    const limpa = s => s.toLowerCase().replace(/[^a-zà-ÿ0-9 ]/g,"").replace(/\s+/g," ").trim();
+    const a = limpa(txt), b = limpa(this.ultimaFala);
+    if(!a) return true;
+    if(b.includes(a) && a.length > 4) return true;
+    const pa = a.split(" ").filter(w=>w.length>3);
+    if(!pa.length) return false;
+    const iguais = pa.filter(w=>b.includes(w)).length;
+    return iguais / pa.length > 0.7;
   },
   /* decide o que fazer com cada frase reconhecida */
   rotear(txt){
-    if(this.falando) return;              /* ignora a própria voz do app */
+    if(this.falando) return;              /* ignora enquanto o app fala */
+    if(this.ecoDaFala(txt)) return;       /* ignora o eco da pergunta */
     if(this.alvo){
       const cb = this.alvo;
       this.alvo = null; this.ocupado = false;
@@ -1846,6 +1928,7 @@ function palavraDeComando(txt){
   return false;
 }
 document.getElementById("btnEscuta").onclick = ()=>{
+  if(document.getElementById("modoCarro").classList.contains("aberta")) return;
   if(Voz.ligada){
     Voz.desligar();
     S.config.escutaSempre = false; salvar();
@@ -1858,7 +1941,7 @@ document.getElementById("btnEscuta").onclick = ()=>{
   }
 };
 (function ligarModoCarro(){
-  const bt = document.getElementById("btnVoz");
+  const bt = document.getElementById("btnEscuta");
   let timer = null;
   const inicia = ()=>{ timer = setTimeout(()=>{ timer=null; abrirModoCarro(); }, 550); };
   const cancela = ()=>{ if(timer){ clearTimeout(timer); timer=null; } };
@@ -1866,24 +1949,6 @@ document.getElementById("btnEscuta").onclick = ()=>{
   ["pointerup","pointerleave","pointercancel"].forEach(e=>bt.addEventListener(e, cancela));
   bt.addEventListener("contextmenu", e=>e.preventDefault());
 })();
-document.getElementById("btnVoz").onclick = ()=>{
-  if(document.getElementById("modoCarro").classList.contains("aberta")) return;
-  aviso("Fale a tarefa. Ex.: “amanhã às 14h revisar antenas da fazenda, urgente, IGRO”.", 4000);
-  Voz.ouvir(texto=>{
-    const t = interpretar(texto);
-    abrirForm(null);
-    rascunho = Object.assign(rascunho, t);
-    document.getElementById("fTitulo").value = rascunho.titulo;
-    document.getElementById("fData").value = rascunho.data||"";
-    document.getElementById("fHora").value = rascunho.hora||"";
-    document.getElementById("fCategoria").value = rascunho.categoria;
-    renderChipsPessoas();
-    document.getElementById("fFreq").value = rascunho.repete.freq;
-    document.getElementById("fIntervalo").value = rascunho.repete.intervalo;
-    atualizarRepete(); atualizarDips();
-    if(!t._temData) perguntarQuando();
-  });
-};
 /* pergunta a data por voz e, ao mesmo tempo, mostra atalhos de toque —
    o reconhecimento encadeado falha com frequência no Android */
 function perguntarQuando(){
@@ -2145,89 +2210,165 @@ document.getElementById("btnSalvarContato").onclick = ()=>{
   renderCfg(); renderTudo();
   aviso("Contato salvo.");
 };
-document.getElementById("btnNovoContato").onclick = ()=>abrirContato(null);
 
 /* agenda do telefone (Contact Picker API)
    ATENÇÃO: select() precisa ser chamado no mesmo "toque" do usuário.
    Qualquer await antes dele descarta a ativação e o Android recusa em silêncio. */
-function agendaDisponivel(){
-  return ("contacts" in navigator) && ("ContactsManager" in window)
-      && navigator.contacts && typeof navigator.contacts.select === "function";
+/* ---- seletor compacto de pessoas ---- */
+let popAlvo = null;   /* função que recebe a lista escolhida */
+let popSel = null;    /* Set em edição */
+function abrirPopPessoas(selecao, aoMudar){
+  popSel = selecao; popAlvo = aoMudar;
+  document.getElementById("buscaPessoa").value = "";
+  renderPopPessoas();
+  document.getElementById("popPessoas").classList.add("aberta");
 }
-function porQueSemAgenda(){
-  const ua = navigator.userAgent;
-  if(location.protocol!=="https:") return "o app não está em HTTPS";
-  if(window.self!==window.top) return "a página está dentro de outro app";
-  if(/iPhone|iPad|iPod/i.test(ua)) return "o iPhone não tem essa função";
-  if(!/Android/i.test(ua)) return "só funciona no Android (no computador não existe)";
-  if(/wv\)/.test(ua)) return "o app abriu dentro de um navegador embutido, não no Chrome";
-  if(/SamsungBrowser|EdgA|OPR|FxiOS|Firefox/i.test(ua)) return "só funciona no Chrome";
-  if(!("ContactsManager" in window)) return "seu Chrome está sem essa função (precisa da versão 80 ou mais nova)";
-  return "o Android recusou o acesso";
-}
-function buscarNaAgenda(){
-  const nota = document.getElementById("notaAgenda");
-  if(!agendaDisponivel()){
-    const motivo = porQueSemAgenda();
-    const msg = "Agenda indisponível: "+motivo+".";
-    if(nota) nota.textContent = msg;
-    aviso(msg + " Use “Adicionar contatos”.", 6000);
-    abrirImportarContatos();
+function renderPopPessoas(){
+  const busca = (document.getElementById("buscaPessoa").value||"").toLowerCase().trim();
+  const box = document.getElementById("listaPop");
+  box.innerHTML = "";
+  const lista = S.pessoas
+    .filter(p=>!busca || p.nome.toLowerCase().includes(busca) || (p.tel||"").includes(busca))
+    .sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR"));
+  if(!lista.length){
+    box.innerHTML = '<div class="pop-vazio">'
+      + (S.pessoas.length ? "Nenhum contato com esse nome." : "Nenhum contato ainda.<br>Eles são criados quando você compartilha uma tarefa, ou toque em “Criar contato”.")
+      + '</div>';
     return;
   }
-  navigator.contacts.select(["name","tel"], {multiple:true})
-    .then(sel=>{
-      if(!sel || !sel.length) return;
-      if(sel.length===1){
-        const c = sel[0];
-        abrirContato(null, {
-          nome: (c.name && c.name[0]) || "",
-          tel:  (c.tel && c.tel[0]) || ""
-        });
-        return;
-      }
-      let novos = 0, repetidos = 0;
-      sel.forEach(c=>{
-        const nome = (c.name && c.name[0]) || "";
-        const tel = normalizarTelefone((c.tel && c.tel[0]) || "");
-        if(!nome) return;
-        if(tel && S.pessoas.some(p=>p.tel===tel)){ repetidos++; return; }
-        S.pessoas.push({
-          id:"p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
-          nome, tel, email:"", papel:"executa",
-          criadoEm:new Date().toISOString(), atualizadoEm:new Date().toISOString()
-        });
-        novos++;
-      });
-      salvar(); renderChipsPessoas(); renderCfg();
-      if(typeof renderPedirPessoas==="function") renderPedirPessoas();
-      aviso(novos+" contatos importados"+(repetidos?" ("+repetidos+" já existiam)":"")+".", 4000);
-    })
-    .catch(e=>{
-      const nm = (e && e.name) || "erro";
-      if(nm==="AbortError") return;
-      const msg = nm==="SecurityError"
-        ? "O Android exigiu que a agenda abrisse direto pelo toque. Toque no botão de novo."
-        : nm==="NotAllowedError" ? "Permissão de contatos negada pelo Android."
-        : "Não consegui abrir a agenda ("+nm+").";
-      if(nota) nota.textContent = msg;
-      aviso(msg, 5500);
-      abrirImportarContatos();
-    });
+  lista.forEach(p=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="pop-item";
+    const marcado = popSel.has(p.id);
+    b.setAttribute("aria-pressed", marcado?"true":"false");
+    b.innerHTML = '<span class="ini">'+iniciais(p.nome)+'</span>'
+      + '<span>'+escapar(p.nome)+(p.tel?'<span class="tel">'+escapar(telBonito(p.tel))+'</span>':'')+'</span>'
+      + '<span class="marca">'+(marcado?"✓":"○")+'</span>';
+    b.onclick = ()=>{
+      if(popSel.has(p.id)) popSel.delete(p.id); else popSel.add(p.id);
+      renderPopPessoas();
+      if(popAlvo) popAlvo();
+    };
+    box.appendChild(b);
+  });
 }
-/* ---- importar contatos ---- */
+document.getElementById("buscaPessoa").addEventListener("input", renderPopPessoas);
+document.getElementById("popNovo").onclick = ()=>{
+  const nome = (document.getElementById("buscaPessoa").value||"").trim();
+  document.getElementById("popPessoas").classList.remove("aberta");
+  abrirContato(null, nome ? {nome} : null);
+};
+document.getElementById("popPessoas").addEventListener("click", e=>{
+  if(e.target.id==="popPessoas") document.getElementById("popPessoas").classList.remove("aberta");
+});
+document.getElementById("btnAbrirPessoas").onclick = ()=>{
+  if(!rascunho) return;
+  if(!Array.isArray(rascunho.pessoaIds)) rascunho.pessoaIds = [];
+  const sel = new Set(rascunho.pessoaIds);
+  abrirPopPessoas(sel, ()=>{
+    rascunho.pessoaIds = Array.from(sel);
+    renderChipsPessoas();
+  });
+};
+
+/* ---- compartilhar tarefa: o contato nasce daqui ---- */
+let enviarTarefa = null, enviarModo = "avisar";
+function abrirEnviar(t, modo){
+  enviarTarefa = t;
+  enviarModo = modo || "avisar";
+  const p = pontuacao(t);
+  const prev = document.getElementById("enviarPrevia");
+  prev.style.setProperty("--cor-prio", corFaixa(faixa(p)));
+  prev.innerHTML = '<div><div class="rot">'+escapar(t.titulo.slice(0,60))+'</div>'
+    + '<div class="conta">'+(t.data?rotuloLongo(t):"sem data")+'</div></div><div class="val">'+p+'</div>';
+  document.getElementById("enviarNome").value = "";
+  marcarModoEnvio();
+  renderConhecidos();
+  document.getElementById("folhaEnviar").classList.add("aberta");
+}
+function marcarModoEnvio(){
+  [["modoSoAvisar","avisar"],["modoConvite","convite"],["modoAprovacao","aprovacao"]].forEach(([id,m])=>{
+    const b = document.getElementById(id);
+    b.style.background = (enviarModo===m) ? "#EAF3F6" : "";
+    b.style.fontWeight = (enviarModo===m) ? "600" : "";
+  });
+  document.getElementById("enviarAgora").textContent =
+    enviarModo==="aprovacao" ? "Pedir aprovação no WhatsApp" : "Abrir WhatsApp";
+}
+document.getElementById("modoSoAvisar").onclick = ()=>{ enviarModo="avisar"; marcarModoEnvio(); };
+document.getElementById("modoConvite").onclick = ()=>{ enviarModo="convite"; marcarModoEnvio(); };
+document.getElementById("modoAprovacao").onclick = ()=>{ enviarModo="aprovacao"; marcarModoEnvio(); };
+function renderConhecidos(){
+  const box = document.getElementById("enviarConhecidos");
+  box.innerHTML = "";
+  if(!S.pessoas.length) return;
+  const rot = document.createElement("div");
+  rot.className = "nota"; rot.style.width="100%"; rot.textContent = "Ou use um já salvo:";
+  box.appendChild(rot);
+  S.pessoas.slice(-8).reverse().forEach(p=>{
+    const b = document.createElement("button");
+    b.type="button"; b.className="sel-pessoa";
+    b.innerHTML = '<span class="ini">'+iniciais(p.nome)+'</span>';
+    b.appendChild(document.createTextNode(primeiroNome(p)));
+    b.onclick = ()=>{ document.getElementById("enviarNome").value = p.nome; };
+    box.appendChild(b);
+  });
+}
+/* garante um contato com aquele nome e devolve o id */
+function contatoPorNome(nome){
+  const n = (nome||"").trim();
+  if(!n) return null;
+  const achou = S.pessoas.find(p=>p.nome.toLowerCase()===n.toLowerCase());
+  if(achou) return achou.id;
+  const id = "p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  S.pessoas.push({id, nome:n, tel:"", email:"", papel:"executa",
+    criadoEm:new Date().toISOString(), atualizadoEm:new Date().toISOString()});
+  return id;
+}
+document.getElementById("enviarAgora").onclick = ()=>{
+  const t = enviarTarefa;
+  if(!t) return;
+  const nome = document.getElementById("enviarNome").value.trim();
+  let pid = null;
+  if(nome){
+    pid = contatoPorNome(nome);
+    if(!Array.isArray(t.pessoaIds)) t.pessoaIds = [];
+    if(!t.pessoaIds.includes(pid)) t.pessoaIds.push(pid);
+    tocar(t);
+  }
+  let txt;
+  if(enviarModo==="aprovacao"){
+    const meuTel = S.config.meuTelefone;
+    if(!telValido(meuTel)){
+      aviso("Antes preencha ⚙ → Meu número no WhatsApp — é por ele que a resposta volta.", 8000);
+      return;
+    }
+    const nomeQuem = (S.config.assinatura||"").split("—")[0].trim() || "quem enviou";
+    const versao = ((t.aprovacao && t.aprovacao.versao) || 0) + 1;
+    t.aprovacao = {
+      solicitada:new Date().toISOString(), versao, recado:"",
+      aprovadores:[{pessoaId:pid, nome:nome||"quem receber", tel:"", estado:"pendente",
+                    quando:null, justificativa:"", sugestao:"", opcoes:[]}]
+    };
+    const pacote = {tipo:"aprov-req", v:1, req:t.id+"#"+versao,
+      de:{nome:nomeQuem, tel:meuTel}, tarefa:pacoteEnxuto(t), recado:""};
+    const url = baseDoApp() + "#ap=" + b64enc(JSON.stringify(pacote));
+    txt = "Preciso da sua aprovação:\n\n*"+t.titulo+"*\n📅 "+(t.data?rotuloLongo(t):"sem data")
+        + "\n\nAbra para aprovar, recusar ou sugerir outra data:\n"+url;
+  } else {
+    txt = textoDeTarefas([t], enviarModo==="convite");
+  }
+  salvar(); renderTudo();
+  fecharFolhas();
+  /* wa.me sem número: o próprio WhatsApp mostra a lista de contatos */
+  window.open("https://wa.me/?text="+encodeURIComponent(txt), "_blank");
+  t.avisos = t.avisos||[];
+  t.avisos.push({quando:new Date().toISOString(), canal:"whatsapp", pessoaId:pid, modelo:enviarModo});
+  tocar(t); salvar();
+  aviso(nome ? "Escolha "+primeiroNome({nome})+" no WhatsApp. Contato salvo aqui." : "Escolha o contato no WhatsApp.", 6000);
+};
 function abrirImportarContatos(){
   document.getElementById("listaContatos").value = "";
-  const pd = document.getElementById("painelDiag");
-  if(pd){ pd.hidden = true; pd.innerHTML = ""; }
-  const av = document.getElementById("avisoAgendaTopo");
-  if(av) av.innerHTML = agendaDisponivel()
-    ? "Abre seus contatos do Android. Marque quem quiser e pronto."
-    : '<span style="color:var(--alta)">Pode não abrir: '+escapar(porQueSemAgenda())+'</span> — toque assim mesmo para testar.';
-  const sub = document.getElementById("subAgenda");
-  sub.innerHTML = agendaDisponivel()
-    ? "Abre a lista de contatos do Android"
-    : '<span style="color:var(--alta)">Indisponível: '+escapar(porQueSemAgenda())+'</span>';
   document.getElementById("folhaContatos").classList.add("aberta");
 }
 /* separa "Marcos Ferreira 27 99999-8888" em nome e telefone */
@@ -2281,112 +2422,21 @@ document.getElementById("colarLista").onclick = async ()=>{
   }catch(e){ aviso("O navegador não liberou a colagem. Cole com o teclado."); }
 };
 /* chamada direta, no mesmo toque, sem fechar folha antes (isso descarta a ativação) */
-document.getElementById("viaAgendaTopo").onclick = ()=>chamarAgendaDireto();
-document.getElementById("viaAgenda").onclick = ()=>chamarAgendaDireto();
-function chamarAgendaDireto(){
-  const av = document.getElementById("avisoAgendaTopo");
-  if(!agendaDisponivel()){
-    const motivo = porQueSemAgenda();
-    if(av) av.innerHTML = '<span style="color:var(--alta)">Não abriu: '+escapar(motivo)
-      + '.</span> Toque em <b>Diagnóstico da agenda</b> abaixo para ver os detalhes.';
-    aviso("Agenda indisponível: "+motivo+".", 6000);
-    mostrarDiagnostico();
-    return;
-  }
-  navigator.contacts.select(["name","tel"], {multiple:true})
-    .then(sel=>{
-      if(!sel || !sel.length) return;
-      let novos = 0, repetidos = 0;
-      sel.forEach(c=>{
-        const nome = (c.name && c.name[0]) || "";
-        const tel = normalizarTelefone((c.tel && c.tel[0]) || "");
-        if(!nome && !tel) return;
-        if(tel && S.pessoas.some(p=>p.tel===tel)){ repetidos++; return; }
-        S.pessoas.push({
-          id:"p_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-          nome: nome || telBonito(tel), tel, email:"", papel:"executa",
-          criadoEm:new Date().toISOString(), atualizadoEm:new Date().toISOString()
-        });
-        novos++;
-      });
-      salvar(); renderChipsPessoas(); renderCfg();
-      if(typeof renderPedirPessoas==="function") renderPedirPessoas();
-      fecharFolhas();
-      aviso(novos+" contatos adicionados"+(repetidos?" ("+repetidos+" já existiam)":"")+".", 4500);
-    })
-    .catch(e=>{
-      const nm = (e && e.name) || "erro";
-      if(nm==="AbortError") return;
-      const msg = nm==="SecurityError"
-        ? "O Android exigiu o toque direto. Toque no botão de novo, sem passar por outro menu."
-        : nm==="NotAllowedError"
-          ? "O Android bloqueou o acesso aos contatos. Vá em Configurações → Apps → Chrome → Permissões → Contatos e permita."
-          : "Não abriu ("+nm+": "+((e&&e.message)||"")+")";
-      if(av) av.innerHTML = '<span style="color:var(--alta)">'+escapar(msg)+'</span>';
-      aviso(msg, 8000);
-      mostrarDiagnostico();
-    });
-}
-document.getElementById("viaDiagnostico").onclick = ()=>mostrarDiagnostico();
-function mostrarDiagnostico(){
-  const box = document.getElementById("painelDiag");
-  const ua = navigator.userAgent;
-  const chrome = (ua.match(/Chrome\/(\d+)/)||[])[1] || "?";
-  const android = (ua.match(/Android (\d+)/)||[])[1] || "não é Android";
-  const linhas = [
-    ["Sistema", android==="não é Android" ? android : "Android "+android],
-    ["Chrome", chrome],
-    ["Endereço seguro (https)", location.protocol==="https:" ? "sim" : "NÃO"],
-    ["Página principal", window.self===window.top ? "sim" : "NÃO (dentro de outro app)"],
-    ["Instalado como app", (window.matchMedia("(display-mode: standalone)").matches ? "sim" : "não — aberto no navegador")],
-    ["navigator.contacts", ("contacts" in navigator) ? "existe" : "NÃO EXISTE"],
-    ["ContactsManager", ("ContactsManager" in window) ? "existe" : "NÃO EXISTE"],
-    ["Navegador embutido (webview)", /wv\)/.test(ua) ? "SIM — este é o problema" : "não"]
-  ];
-  let html = '<div class="painel-ap"><b>Diagnóstico</b>';
-  linhas.forEach(([k,v])=>{
-    const ruim = /NÃO|SIM —/.test(v);
-    html += '<div class="ap-linha"><span>'+escapar(k)+'</span><span style="font-family:var(--mono);font-size:11px;'
-      + (ruim?'color:var(--alta);font-weight:700':'color:var(--tinta-3)')+'">'+escapar(v)+'</span></div>';
-  });
-  html += '</div>';
-  html += '<div class="acoes"><button class="btn btn-vazio" id="diagTestar">Testar agora</button>'
-        + '<button class="btn btn-vazio" id="diagCopiar">Copiar diagnóstico</button></div>';
-  html += '<div class="nota" id="diagResultado" style="margin-top:8px"></div>';
-  box.innerHTML = html;
-  box.hidden = false;
-  box.scrollIntoView({behavior:"smooth", block:"nearest"});
-
-  document.getElementById("diagTestar").onclick = ()=>{
-    const res = document.getElementById("diagResultado");
-    if(!("contacts" in navigator) || !navigator.contacts || !navigator.contacts.select){
-      res.innerHTML = '<span style="color:var(--alta)">navigator.contacts.select não existe neste navegador.</span>';
-      return;
-    }
-    res.textContent = "Chamando…";
-    navigator.contacts.select(["name","tel"], {multiple:true})
-      .then(sel=>{ res.innerHTML = '<span style="color:var(--baixa)">Funcionou: '+(sel?sel.length:0)+' selecionados.</span>'; })
-      .catch(e=>{ res.innerHTML = '<span style="color:var(--alta)">Erro: '+escapar((e&&e.name)||"?")+' — '+escapar((e&&e.message)||"")+'</span>'; });
-  };
-  document.getElementById("diagCopiar").onclick = async ()=>{
-    const txt = "Diagnóstico agenda\n" + linhas.map(([k,v])=>k+": "+v).join("\n") + "\nUA: " + ua;
-    try{ await navigator.clipboard.writeText(txt); aviso("Diagnóstico copiado."); }
-    catch(e){ aviso("Não consegui copiar."); }
-  };
-}
-document.getElementById("viaCompartilhar").onclick = ()=>{
-  const instalado = window.matchMedia("(display-mode: standalone)").matches;
-  alert("Como importar pelo app Contatos:\n\n"
-    + "1. Abra o app Contatos do celular\n"
-    + "2. Segure um contato para selecionar, marque quantos quiser\n"
-    + "3. Toque em Compartilhar (ou ⋮ → Compartilhar)\n"
-    + "4. Escolha \"Agenda Tarefas\" na lista\n\n"
-    + "Eles entram aqui automaticamente."
-    + (instalado ? "" : "\n\nATENÇÃO: o app precisa estar instalado na tela inicial para aparecer nessa lista."));
-};
 document.getElementById("viaArquivo").onclick = ()=>{
-  aviso("No seletor, escolha “Arquivos” e ache o .vcf.", 6000);
-  document.getElementById("arqVCF").click();
+  aviso("No seletor que abrir, escolha “Arquivos” e ache o .vcf.", 6000);
+  document.getElementById("arqVCF2").click();
+};
+document.getElementById("arqVCF2").onchange = e=>{
+  Array.from(e.target.files||[]).forEach(f=>{
+    const fr = new FileReader();
+    fr.onload = ()=>{
+      const c = String(fr.result);
+      if(/BEGIN:VCARD/i.test(c)) lerVCF(c);
+      else aviso("Este arquivo não tem contatos.");
+    };
+    fr.readAsText(f);
+  });
+  e.target.value = "";
 };
 document.getElementById("viaManual").onclick = ()=>{ fecharFolhas(); abrirContato(null); };
 function lerVCF(txt){
@@ -2424,15 +2474,6 @@ function lerVCF(txt){
     + (repetidos?" · "+repetidos+" já existiam":"")
     + (semTel?" · "+semTel+" sem telefone":"") + ".", 6000);
 }
-document.getElementById("btnAgenda").onclick = abrirImportarContatos;
-document.getElementById("arqVCF").onchange = e=>{
-  Array.from(e.target.files||[]).forEach(f=>{
-    const fr = new FileReader();
-    fr.onload = ()=>lerVCF(String(fr.result));
-    fr.readAsText(f);
-  });
-  e.target.value = "";
-};
 
 /* ===== convite: agenda + alarme no aparelho de quem recebe ===== */
 function fusoLocal(){
@@ -2747,7 +2788,7 @@ function renderPedirPessoas(){
   });
 }
 document.getElementById("pedirNovo").onclick = ()=>abrirContato(null);
-document.getElementById("pedirAgenda").onclick = abrirImportarContatos;
+document.getElementById("pedirAgenda").onclick = ()=>abrirPopPessoas(pedirSelecao, renderPedirPessoas);
 
 /* monta o pedido uma vez e devolve texto + link, para qualquer canal */
 function prepararPedido(){
@@ -3200,10 +3241,8 @@ function abrirAcoesTarefa(t){
   box.innerHTML = "";
   const ps = pessoasDaTarefa(t).map(pessoaDe).filter(Boolean);
   const itens = [
-    ["📲","Compartilhar no WhatsApp","Manda o texto da tarefa para qualquer contato",
-      ()=>{ fecharFolhas(); compartilharTarefas([t], false); }],
-    ["📅","Compartilhar com convite","Inclui link para a pessoa salvar na agenda com alarme",
-      ()=>{ fecharFolhas(); compartilharTarefas([t], true); }, !!t.data],
+    ["📲","Compartilhar no WhatsApp","Avisar, mandar convite ou pedir aprovação",
+      ()=>{ fecharFolhas(); abrirEnviar(t, "avisar"); }],
     ["💬","Avisar / cobrar",(ps.length ? "Mensagem pronta para "+ps.map(primeiroNome).join(", ") : "Escolher modelo de mensagem"),
       ()=>{ fecharFolhas(); abrirMensagem(t, diasAtraso(t)>0 ? "cobrar" : "aviso"); }],
     ["📤","Enviar como tarefa","A pessoa recebe e adiciona no app dela",

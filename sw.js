@@ -2,7 +2,7 @@
    Rede primeiro, cache como rede de segurança.
    Também recebe o que o Android compartilha (texto e arquivos). */
 
-const VERSAO = "agenda-tarefas-v12";
+const VERSAO = "agenda-tarefas-v13";
 const TEMP = "compartilhado-temp";
 const ESSENCIAIS = [
   "./",
