@@ -1,36 +1,23 @@
 {
-  "id": "/painel-gut/",
   "name": "Agenda Tarefas",
   "short_name": "Agenda Tarefas",
-  "description": "Tarefas por gravidade, urgência e tendência, com atraso acumulado",
+  "description": "Tarefas por gravidade, urgencia e tendencia",
   "lang": "pt-BR",
-  "dir": "ltr",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
-  "orientation": "portrait",
   "background_color": "#E6EAEC",
   "theme_color": "#12181D",
-  "categories": [
-    "productivity",
-    "utilities"
-  ],
   "icons": [
     {
       "src": "icone-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
       "src": "icone-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
       "src": "icone-512-m.png",
@@ -40,7 +27,7 @@
     }
   ],
   "share_target": {
-    "action": "./share",
+    "action": "share",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
@@ -52,16 +39,9 @@
           "name": "arquivos",
           "accept": [
             "text/vcard",
-            "text/x-vcard",
-            "text/directory",
-            ".vcf",
             "text/calendar",
-            ".ics",
-            "application/json",
-            ".json",
             "text/plain",
-            ".txt",
-            ".eml"
+            "application/json"
           ]
         }
       ]
@@ -69,50 +49,19 @@
   },
   "shortcuts": [
     {
-      "name": "Modo dirigindo",
-      "short_name": "Dirigindo",
-      "url": "./index.html?acao=carro",
-      "description": "Criar tarefa só por voz",
-      "icons": [
-        {
-          "src": "icone-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Assistente de voz",
+      "short_name": "Voz",
+      "url": "index.html?acao=carro"
     },
     {
-      "name": "Ouvir minhas tarefas",
+      "name": "Ouvir tarefas",
       "short_name": "Ouvir",
-      "url": "./index.html?acao=ler",
-      "description": "Lê as tarefas em voz alta",
-      "icons": [
-        {
-          "src": "icone-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "index.html?acao=ler"
     },
     {
       "name": "Nova tarefa",
       "short_name": "Nova",
-      "url": "./index.html?acao=nova",
-      "icons": [
-        {
-          "src": "icone-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Triagem do dia",
-      "short_name": "Triagem",
-      "url": "./index.html?acao=triagem",
-      "icons": [
-        {
-          "src": "icone-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "index.html?acao=nova"
     }
   ]
 }
